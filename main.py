@@ -72,27 +72,45 @@ if __name__ == "__main__":
     windowSize = width, height = (500, 500)
     pygame.init()
     pygame.display.init()
-    screen = pygame.display.set_mode(size=windowSize)
+    screen = pygame.display.set_mode(windowSize,
+                                 pygame.RESIZABLE)
     screen.fill((0,0,0))
     nodes = {}
-    for i in range(0, 500, 20):
-        for j in range(0,500, 20):
-            rect = pygame.rect.Rect((i, j), (18, 18))
-            pygame.draw.rect(screen, (128, 128, 128), rect)
-            nodes[(int(i/20),int(j/20))] = rect
+    oldWindowSize = [pygame.display.get_window_size()[0], pygame.display.get_window_size()[1]]
+    drawnNodes = {}
     while True:
+        maxScreenWidth = pygame.display.get_window_size()[0]
+        maxScreenHeight = pygame.display.get_window_size()[1]
+        if pygame.display.get_window_size()[0] % 20 != 0:
+            maxScreenWidth = pygame.display.get_window_size()[0] - pygame.display.get_window_size()[0] % 20
+            while maxScreenWidth % 20 != 0:
+                maxScreenWidth = pygame.display.get_window_size()[0] - pygame.display.get_window_size()[0] % 20
+        if pygame.display.get_window_size()[1] % 20 != 0:
+            maxScreenHeight = pygame.display.get_window_size()[1] - pygame.display.get_window_size()[1] % 20
+            while maxScreenHeight % 20 != 0:
+                maxScreenHeight = pygame.display.get_window_size()[1] - pygame.display.get_window_size()[1] % 20
+        for i in range(0, maxScreenWidth, 20):
+            for j in range(0, maxScreenHeight, 20):
+                if (int(i / 20), int(j / 20)) not in drawnNodes:
+                    drawnNodes[(int(i/ 20), int(j / 20))] = 0
+                if drawnNodes[(int(i / 20), int(j / 20))] == 0:
+                    rect = pygame.rect.Rect((i, j), (18, 18))
+                    pygame.draw.rect(screen, (128, 128, 128), rect)
+                    nodes[(int(i / 20), int(j / 20))] = rect
         for event in pygame.event.get():
             if event.type == pygame.QUIT: sys.exit()
         if pygame.mouse.get_pressed()[0] == True:
             xOffset = int(pygame.mouse.get_pos()[0]/20)
             yOffset = int(pygame.mouse.get_pos()[1]/20)
             pygame.draw.rect(screen, (0,0,0), nodes[(xOffset,yOffset)])
+            drawnNodes[(int(pygame.mouse.get_pos()[0]/20),int(pygame.mouse.get_pos()[1]/20))] = 1
         if pygame.mouse.get_pressed()[2] == True:
             xOffset = int(pygame.mouse.get_pos()[0] / 20)
             yOffset = int(pygame.mouse.get_pos()[1] / 20)
             pygame.draw.rect(screen, (128, 128, 128), nodes[(xOffset, yOffset)])
+            drawnNodes[(int(pygame.mouse.get_pos()[0] / 20), int(pygame.mouse.get_pos()[1] / 20))] = 0
+        oldWindowSize = [pygame.display.get_window_size()[0], pygame.display.get_window_size()[1]]
         pygame.display.flip()
-
     # node1 = TreeNode(4)
     # node1.insert(2)
     # node1.insert(7)
