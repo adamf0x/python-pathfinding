@@ -91,12 +91,6 @@ if __name__ == "__main__":
             xOffset = int(pygame.mouse.get_pos()[0] / 20)
             yOffset = int(pygame.mouse.get_pos()[1] / 20)
             pygame.draw.rect(screen, (128, 128, 128), nodes[(xOffset, yOffset)])
-        # if pygame.mouse.get_pressed()[0] == True:
-        #     rect = pygame.rect.Rect(pygame.mouse.get_pos(), (3,3))
-        #     pygame.draw.rect(screen, (255,255,255), rect)
-        # if pygame.mouse.get_pressed()[2] == True:
-        #     rect = pygame.rect.Rect(pygame.mouse.get_pos(), (5, 5))
-        #     pygame.draw.rect(screen, (0, 0, 0), rect)
         pygame.display.flip()
 
     # node1 = TreeNode(4)
