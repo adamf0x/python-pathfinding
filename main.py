@@ -87,7 +87,6 @@ if __name__ == "__main__":
     placeStart = False
     placeEnd = False
     while True:
-        print(placeStart, placeEnd)
         for event in pygame.event.get():
             if event.type == pygame.QUIT: sys.exit()
             maxScreenWidth = pygame.display.get_window_size()[0]
@@ -95,6 +94,9 @@ if __name__ == "__main__":
             screen.fill((0, 0, 0))
             visualizeButton = pygame.rect.Rect((int(pygame.display.get_window_size()[0]/2) - 50, 10), (100, 30))
             pygame.draw.rect(screen,(70, 40, 100), visualizeButton)
+            font = pygame.font.SysFont(None, 15)
+            img = font.render('Click To Start', True, (225, 255, 255))
+            screen.blit(img, (int(visualizeButton.x) +  int(visualizeButton.width/2)-35, int(visualizeButton.y) + int(visualizeButton.height/2)-12))
             if pygame.display.get_window_size()[0] % cellSize != 0:
                 maxScreenWidth = pygame.display.get_window_size()[0] - pygame.display.get_window_size()[0] % cellSize
                 while maxScreenWidth % cellSize != 0:
@@ -140,7 +142,7 @@ if __name__ == "__main__":
                         (int(pygame.mouse.get_pos()[0] / cellSize), int(pygame.mouse.get_pos()[1] / cellSize))] = 2
                     placeStart = False
                     continue
-                if placeEnd == True:
+                elif placeEnd == True:
                     pygame.draw.rect(screen, (255, 0, 0), nodes[(xOffset, yOffset)])
                     drawnNodes[
                         (int(pygame.mouse.get_pos()[0] / cellSize), int(pygame.mouse.get_pos()[1] / cellSize))] = 3
@@ -159,7 +161,7 @@ if __name__ == "__main__":
                     pygame.draw.rect(screen, (255, 255, 255), nodes[(xOffset, yOffset)])
                     drawnNodes[(int(pygame.mouse.get_pos()[0] / cellSize), int(pygame.mouse.get_pos()[1] / cellSize))] = 0
                     continue
-                if drawnNodes[
+                elif drawnNodes[
                     (int(pygame.mouse.get_pos()[0] / cellSize), int(pygame.mouse.get_pos()[1] / cellSize))] == 3:
                     placeEnd = True
                     pygame.draw.rect(screen, (255, 255, 255), nodes[(xOffset, yOffset)])
