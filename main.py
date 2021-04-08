@@ -4,9 +4,10 @@
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 import math
 import sys
+import time
 
 import pygame
-
+from pygame.locals import *
 
 class Node:
 
@@ -74,43 +75,105 @@ if __name__ == "__main__":
     pygame.display.init()
     screen = pygame.display.set_mode(windowSize,
                                  pygame.RESIZABLE)
-    screen.fill((0,0,0))
     nodes = {}
     oldWindowSize = [pygame.display.get_window_size()[0], pygame.display.get_window_size()[1]]
     drawnNodes = {}
+    cellSize = 20
+    maxScreenWidth = pygame.display.get_window_size()[0]
+    maxScreenHeight = pygame.display.get_window_size()[1]
+    drawnNodes[(0, 3)] = 2
+    drawnNodes[(int(maxScreenWidth / cellSize) - 1, int(maxScreenHeight / cellSize) - 1)] = 3
+    screenSizeChange = True
+    placeStart = False
+    placeEnd = False
     while True:
-        maxScreenWidth = pygame.display.get_window_size()[0]
-        maxScreenHeight = pygame.display.get_window_size()[1]
-        if pygame.display.get_window_size()[0] % 20 != 0:
-            maxScreenWidth = pygame.display.get_window_size()[0] - pygame.display.get_window_size()[0] % 20
-            while maxScreenWidth % 20 != 0:
-                maxScreenWidth = pygame.display.get_window_size()[0] - pygame.display.get_window_size()[0] % 20
-        if pygame.display.get_window_size()[1] % 20 != 0:
-            maxScreenHeight = pygame.display.get_window_size()[1] - pygame.display.get_window_size()[1] % 20
-            while maxScreenHeight % 20 != 0:
-                maxScreenHeight = pygame.display.get_window_size()[1] - pygame.display.get_window_size()[1] % 20
-        for i in range(0, maxScreenWidth, 20):
-            for j in range(0, maxScreenHeight, 20):
-                if (int(i / 20), int(j / 20)) not in drawnNodes:
-                    drawnNodes[(int(i/ 20), int(j / 20))] = 0
-                if drawnNodes[(int(i / 20), int(j / 20))] == 0:
-                    rect = pygame.rect.Rect((i, j), (18, 18))
-                    pygame.draw.rect(screen, (128, 128, 128), rect)
-                    nodes[(int(i / 20), int(j / 20))] = rect
+        print(placeStart, placeEnd)
         for event in pygame.event.get():
             if event.type == pygame.QUIT: sys.exit()
-        if pygame.mouse.get_pressed()[0] == True:
-            xOffset = int(pygame.mouse.get_pos()[0]/20)
-            yOffset = int(pygame.mouse.get_pos()[1]/20)
-            pygame.draw.rect(screen, (0,0,0), nodes[(xOffset,yOffset)])
-            drawnNodes[(int(pygame.mouse.get_pos()[0]/20),int(pygame.mouse.get_pos()[1]/20))] = 1
-        if pygame.mouse.get_pressed()[2] == True:
-            xOffset = int(pygame.mouse.get_pos()[0] / 20)
-            yOffset = int(pygame.mouse.get_pos()[1] / 20)
-            pygame.draw.rect(screen, (128, 128, 128), nodes[(xOffset, yOffset)])
-            drawnNodes[(int(pygame.mouse.get_pos()[0] / 20), int(pygame.mouse.get_pos()[1] / 20))] = 0
-        oldWindowSize = [pygame.display.get_window_size()[0], pygame.display.get_window_size()[1]]
-        pygame.display.flip()
+            maxScreenWidth = pygame.display.get_window_size()[0]
+            maxScreenHeight = pygame.display.get_window_size()[1]
+            screen.fill((0, 0, 0))
+            visualizeButton = pygame.rect.Rect((int(pygame.display.get_window_size()[0]/2) - 50, 10), (100, 30))
+            pygame.draw.rect(screen,(70, 40, 100), visualizeButton)
+            if pygame.display.get_window_size()[0] % cellSize != 0:
+                maxScreenWidth = pygame.display.get_window_size()[0] - pygame.display.get_window_size()[0] % cellSize
+                while maxScreenWidth % cellSize != 0:
+                    maxScreenWidth = pygame.display.get_window_size()[0] - pygame.display.get_window_size()[0] % cellSize
+            if pygame.display.get_window_size()[1] % cellSize != 0:
+                maxScreenHeight = pygame.display.get_window_size()[1] - pygame.display.get_window_size()[1] % cellSize
+                while maxScreenHeight % cellSize != 0:
+                    maxScreenHeight = pygame.display.get_window_size()[1] - pygame.display.get_window_size()[1] % cellSize
+            for i in range(0, maxScreenWidth, cellSize):
+                for j in range(60, maxScreenHeight, cellSize):
+                    if (int(i / cellSize), int(j / cellSize)) not in drawnNodes:
+                        drawnNodes[(int(i/ cellSize), int(j / cellSize))] = 0
+                    if drawnNodes[(int(i / cellSize), int(j / cellSize))] == 0:
+                        rect = pygame.rect.Rect((i, j), (cellSize-2, cellSize-2))
+                        pygame.draw.rect(screen, (255, 255, 255), rect)
+                        nodes[(int(i / cellSize), int(j / cellSize))] = rect
+                    elif drawnNodes[(int(i / cellSize), int(j / cellSize))] == 1:
+                        rect = pygame.rect.Rect((i, j), (cellSize-2, cellSize-2))
+                        pygame.draw.rect(screen, (128, 128, 128), rect)
+                        nodes[(int(i / cellSize), int(j / cellSize))] = rect
+                    elif drawnNodes[(int(i / cellSize), int(j / cellSize))] == 2:
+                        rect = pygame.rect.Rect((i, j), (cellSize - 2, cellSize - 2))
+                        pygame.draw.rect(screen, (0, 255, 0), rect)
+                        nodes[(int(i / cellSize), int(j / cellSize))] = rect
+                    elif drawnNodes[(int(i / cellSize), int(j / cellSize))] == 3:
+                        rect = pygame.rect.Rect((i, j), (cellSize - 2, cellSize - 2))
+                        pygame.draw.rect(screen, (255, 0, 0), rect)
+                        nodes[(int(i / cellSize), int(j / cellSize))] = rect
+
+            if (visualizeButton.x <= pygame.mouse.get_pos()[0] <= (visualizeButton.x + visualizeButton.width) and visualizeButton.y <= pygame.mouse.get_pos()[1] <= (visualizeButton.y + visualizeButton.height)) and pygame.mouse.get_pressed()[0] == True:
+                print('visualize clicked')
+                continue
+            if (pygame.mouse.get_pressed()[0] or pygame.mouse.get_pressed()[2] == True) and (pygame.mouse.get_pos()[1] <= 60 or pygame.mouse.get_pos()[1] >= maxScreenHeight or pygame.mouse.get_pos()[0] >= maxScreenWidth):
+                continue
+            if pygame.mouse.get_pressed()[0] == True:
+                if  drawnNodes[
+                        (int(pygame.mouse.get_pos()[0] / cellSize), int(pygame.mouse.get_pos()[1] / cellSize))] == 2 or  drawnNodes[
+                        (int(pygame.mouse.get_pos()[0] / cellSize), int(pygame.mouse.get_pos()[1] / cellSize))] == 3:
+                    continue
+                if placeStart == True:
+                    pygame.draw.rect(screen, (0, 255, 0), nodes[(xOffset, yOffset)])
+                    drawnNodes[
+                        (int(pygame.mouse.get_pos()[0] / cellSize), int(pygame.mouse.get_pos()[1] / cellSize))] = 2
+                    placeStart = False
+                    continue
+                if placeEnd == True:
+                    pygame.draw.rect(screen, (255, 0, 0), nodes[(xOffset, yOffset)])
+                    drawnNodes[
+                        (int(pygame.mouse.get_pos()[0] / cellSize), int(pygame.mouse.get_pos()[1] / cellSize))] = 3
+                    placeEnd = False
+                    continue
+                xOffset = int(pygame.mouse.get_pos()[0]/cellSize)
+                yOffset = int(pygame.mouse.get_pos()[1]/cellSize)
+                pygame.draw.rect(screen, (128,128,128), nodes[(xOffset,yOffset)])
+                drawnNodes[(int(pygame.mouse.get_pos()[0]/cellSize),int(pygame.mouse.get_pos()[1]/cellSize))] = 1
+            if pygame.mouse.get_pressed()[2] == True:
+                xOffset = int(pygame.mouse.get_pos()[0] / cellSize)
+                yOffset = int(pygame.mouse.get_pos()[1] / cellSize)
+                if drawnNodes[(int(pygame.mouse.get_pos()[0]/ cellSize), int(pygame.mouse.get_pos()[1] / cellSize))] == 2:
+                    print('place start set to true')
+                    placeStart = True
+                    pygame.draw.rect(screen, (255, 255, 255), nodes[(xOffset, yOffset)])
+                    drawnNodes[(int(pygame.mouse.get_pos()[0] / cellSize), int(pygame.mouse.get_pos()[1] / cellSize))] = 0
+                    continue
+                if drawnNodes[
+                    (int(pygame.mouse.get_pos()[0] / cellSize), int(pygame.mouse.get_pos()[1] / cellSize))] == 3:
+                    placeEnd = True
+                    pygame.draw.rect(screen, (255, 255, 255), nodes[(xOffset, yOffset)])
+                    drawnNodes[
+                        (int(pygame.mouse.get_pos()[0] / cellSize), int(pygame.mouse.get_pos()[1] / cellSize))] = 0
+                    continue
+                pygame.draw.rect(screen, (255, 255, 255), nodes[(xOffset, yOffset)])
+                drawnNodes[(int(pygame.mouse.get_pos()[0]/ cellSize), int(pygame.mouse.get_pos()[1] / cellSize))] = 0
+            if placeStart or placeEnd:
+                continue
+            placeStart = False
+            placeEnd = False
+            visualize = False
+            pygame.display.flip()
     # node1 = TreeNode(4)
     # node1.insert(2)
     # node1.insert(7)
