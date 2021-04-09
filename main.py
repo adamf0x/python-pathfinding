@@ -69,6 +69,87 @@ class TreeNode:
         if self.right:
             self.right.PrintTree()
 
+def dijkstras(nodes, startNode, endNode, dimensions):
+    completedNodes = {}
+    shortestPathToFinishFromStart = []
+    distanceToNodes = {}
+    for node in nodes:
+        xIndex, yIndex = int(nodes[node].x/cellSize), int(nodes[node].y/cellSize)
+        distanceToNodes[(xIndex, yIndex)] = float('inf')
+    distanceToNodes[startNode] = 0
+    while len(completedNodes) != len(nodes):
+        minDistanceNodeIndex = None
+        min = float('inf')
+        for distanceToNodesIndex in distanceToNodes:
+            if distanceToNodesIndex not in completedNodes:
+                if distanceToNodes[distanceToNodesIndex] < min:
+                    min = distanceToNodes[distanceToNodesIndex]
+                    minDistanceNodeIndex = distanceToNodesIndex
+        if minDistanceNodeIndex == endNode:
+            completedNodes[minDistanceNodeIndex] = distanceToNodes[minDistanceNodeIndex]
+            break
+        adjacentNodes = []
+        if minDistanceNodeIndex[0] > 0 and minDistanceNodeIndex[0] < dimensions[0] and minDistanceNodeIndex[1] < dimensions[1] and minDistanceNodeIndex[1] > 0:
+            adjacentNodes.append((minDistanceNodeIndex[0]-1, minDistanceNodeIndex[1]))
+            adjacentNodes.append((minDistanceNodeIndex[0]-1, minDistanceNodeIndex[1]-1))
+            adjacentNodes.append((minDistanceNodeIndex[0], minDistanceNodeIndex[1] - 1))
+            adjacentNodes.append((minDistanceNodeIndex[0] + 1, minDistanceNodeIndex[1]))
+            adjacentNodes.append((minDistanceNodeIndex[0] + 1, minDistanceNodeIndex[1]+1))
+            adjacentNodes.append((minDistanceNodeIndex[0], minDistanceNodeIndex[1] + 1))
+            adjacentNodes.append((minDistanceNodeIndex[0]-1, minDistanceNodeIndex[1] + 1))
+            adjacentNodes.append((minDistanceNodeIndex[0] + 1, minDistanceNodeIndex[1] - 1))
+        elif minDistanceNodeIndex[0] == 0 and minDistanceNodeIndex[1] == 0:
+            adjacentNodes.append((minDistanceNodeIndex[0] + 1, minDistanceNodeIndex[1]))
+            adjacentNodes.append((minDistanceNodeIndex[0] + 1, minDistanceNodeIndex[1] + 1))
+            adjacentNodes.append((minDistanceNodeIndex[0], minDistanceNodeIndex[1] + 1))
+        elif minDistanceNodeIndex[0] == 0 and minDistanceNodeIndex[1] == dimensions[1]:
+            adjacentNodes.append((minDistanceNodeIndex[0] + 1, minDistanceNodeIndex[1]))
+            adjacentNodes.append((minDistanceNodeIndex[0] + 1, minDistanceNodeIndex[1] + 1))
+            adjacentNodes.append((minDistanceNodeIndex[0], minDistanceNodeIndex[1] - 1))
+        elif minDistanceNodeIndex[0] == dimensions[0] and minDistanceNodeIndex[1] == 0:
+            adjacentNodes.append((minDistanceNodeIndex[0] - 1, minDistanceNodeIndex[1]))
+            adjacentNodes.append((minDistanceNodeIndex[0] - 1, minDistanceNodeIndex[1] +1))
+            adjacentNodes.append((minDistanceNodeIndex[0], minDistanceNodeIndex[1] + 1))
+        elif minDistanceNodeIndex[0] == dimensions[0] and minDistanceNodeIndex[1] == dimensions[1]:
+            adjacentNodes.append((minDistanceNodeIndex[0] - 1, minDistanceNodeIndex[1]))
+            adjacentNodes.append((minDistanceNodeIndex[0] - 1, minDistanceNodeIndex[1] - 1))
+            adjacentNodes.append((minDistanceNodeIndex[0], minDistanceNodeIndex[1] - 1))
+        elif minDistanceNodeIndex[1] == dimensions[1]:
+            adjacentNodes.append((minDistanceNodeIndex[0] - 1, minDistanceNodeIndex[1]))
+            adjacentNodes.append((minDistanceNodeIndex[0] - 1, minDistanceNodeIndex[1] - 1))
+            adjacentNodes.append((minDistanceNodeIndex[0] + 1, minDistanceNodeIndex[1]))
+            adjacentNodes.append((minDistanceNodeIndex[0] + 1, minDistanceNodeIndex[1] - 1))
+            adjacentNodes.append((minDistanceNodeIndex[0], minDistanceNodeIndex[1] - 1))
+        elif minDistanceNodeIndex[0] == 0:
+            adjacentNodes.append((minDistanceNodeIndex[0] + 1, minDistanceNodeIndex[1]))
+            adjacentNodes.append((minDistanceNodeIndex[0], minDistanceNodeIndex[1] - 1))
+            adjacentNodes.append((minDistanceNodeIndex[0] + 1, minDistanceNodeIndex[1] -1))
+            adjacentNodes.append((minDistanceNodeIndex[0], minDistanceNodeIndex[1] + 1))
+            adjacentNodes.append((minDistanceNodeIndex[0]+1, minDistanceNodeIndex[1] + 1))
+        elif minDistanceNodeIndex[0] == dimensions[0]:
+            adjacentNodes.append((minDistanceNodeIndex[0] - 1, minDistanceNodeIndex[1]))
+            adjacentNodes.append((minDistanceNodeIndex[0], minDistanceNodeIndex[1] + 1))
+            adjacentNodes.append((minDistanceNodeIndex[0] - 1, minDistanceNodeIndex[1] + 1))
+            adjacentNodes.append((minDistanceNodeIndex[0], minDistanceNodeIndex[1] - 1))
+            adjacentNodes.append((minDistanceNodeIndex[0] - 1, minDistanceNodeIndex[1] - 1))
+        elif minDistanceNodeIndex[0] > 0 and minDistanceNodeIndex[1] == 0:
+            adjacentNodes.append((minDistanceNodeIndex[0] - 1, minDistanceNodeIndex[1]))
+            adjacentNodes.append((minDistanceNodeIndex[0] - 1, minDistanceNodeIndex[1] + 1))
+            adjacentNodes.append((minDistanceNodeIndex[0] + 1, minDistanceNodeIndex[1]))
+            adjacentNodes.append((minDistanceNodeIndex[0] + 1, minDistanceNodeIndex[1] + 1))
+            adjacentNodes.append((minDistanceNodeIndex[0], minDistanceNodeIndex[1] + 1))
+        for adjacentNodeIndex in adjacentNodes:
+            if adjacentNodeIndex not in completedNodes:
+                if minDistanceNodeIndex[0] != adjacentNodeIndex[0] and minDistanceNodeIndex[1] != adjacentNodeIndex[1]:
+                    distanceToNodes[adjacentNodeIndex] = distanceToNodes[minDistanceNodeIndex] + 2
+                else:
+                    distanceToNodes[adjacentNodeIndex] = distanceToNodes[minDistanceNodeIndex] + 1
+        completedNodes[minDistanceNodeIndex] = distanceToNodes[minDistanceNodeIndex]
+        # for distanceIndex in distanceToNodes:
+        #     if distanceToNodes[distanceIndex] != float('inf') and distanceIndex not in shortestPathNodes:
+        #         print(distanceIndex, distanceToNodes[distanceIndex])
+        # print()
+    return completedNodes, shortestPathToFinishFromStart
 if __name__ == "__main__":
     windowSize = width, height = (500, 500)
     pygame.init()
@@ -81,8 +162,10 @@ if __name__ == "__main__":
     cellSize = 20
     maxScreenWidth = pygame.display.get_window_size()[0]
     maxScreenHeight = pygame.display.get_window_size()[1]
-    drawnNodes[(0, 3)] = 2
+    drawnNodes[(0, 0)] = 2
     drawnNodes[(int(maxScreenWidth / cellSize) - 1, int(maxScreenHeight / cellSize) - 1)] = 3
+    startIndex = (0,0)
+    endIndex = ((int(maxScreenWidth / cellSize) - 1, int(maxScreenHeight / cellSize) - 1))
     screenSizeChange = True
     placeStart = False
     placeEnd = False
@@ -92,86 +175,114 @@ if __name__ == "__main__":
             maxScreenWidth = pygame.display.get_window_size()[0]
             maxScreenHeight = pygame.display.get_window_size()[1]
             screen.fill((0, 0, 0))
-            visualizeButton = pygame.rect.Rect((int(pygame.display.get_window_size()[0]/2) - 50, 10), (100, 30))
-            pygame.draw.rect(screen,(70, 40, 100), visualizeButton)
-            font = pygame.font.SysFont(None, 15)
-            img = font.render('Click To Start', True, (225, 255, 255))
-            screen.blit(img, (int(visualizeButton.x) +  int(visualizeButton.width/2)-35, int(visualizeButton.y) + int(visualizeButton.height/2)-12))
+            widthOffsetToCenter = 0
             if pygame.display.get_window_size()[0] % cellSize != 0:
                 maxScreenWidth = pygame.display.get_window_size()[0] - pygame.display.get_window_size()[0] % cellSize
                 while maxScreenWidth % cellSize != 0:
                     maxScreenWidth = pygame.display.get_window_size()[0] - pygame.display.get_window_size()[0] % cellSize
+                widthOffsetToCenter = pygame.display.get_window_size()[0] % cellSize/2
             if pygame.display.get_window_size()[1] % cellSize != 0:
                 maxScreenHeight = pygame.display.get_window_size()[1] - pygame.display.get_window_size()[1] % cellSize
                 while maxScreenHeight % cellSize != 0:
                     maxScreenHeight = pygame.display.get_window_size()[1] - pygame.display.get_window_size()[1] % cellSize
+            nodes = {}
             for i in range(0, maxScreenWidth, cellSize):
-                for j in range(60, maxScreenHeight, cellSize):
+                for j in range(0, maxScreenHeight, cellSize):
                     if (int(i / cellSize), int(j / cellSize)) not in drawnNodes:
                         drawnNodes[(int(i/ cellSize), int(j / cellSize))] = 0
                     if drawnNodes[(int(i / cellSize), int(j / cellSize))] == 0:
-                        rect = pygame.rect.Rect((i, j), (cellSize-2, cellSize-2))
+                        rect = pygame.rect.Rect((i + widthOffsetToCenter, j), (cellSize-2, cellSize-2))
                         pygame.draw.rect(screen, (255, 255, 255), rect)
                         nodes[(int(i / cellSize), int(j / cellSize))] = rect
                     elif drawnNodes[(int(i / cellSize), int(j / cellSize))] == 1:
-                        rect = pygame.rect.Rect((i, j), (cellSize-2, cellSize-2))
+                        rect = pygame.rect.Rect((i+ widthOffsetToCenter, j), (cellSize-2, cellSize-2))
                         pygame.draw.rect(screen, (128, 128, 128), rect)
                         nodes[(int(i / cellSize), int(j / cellSize))] = rect
-                    elif drawnNodes[(int(i / cellSize), int(j / cellSize))] == 2:
-                        rect = pygame.rect.Rect((i, j), (cellSize - 2, cellSize - 2))
-                        pygame.draw.rect(screen, (0, 255, 0), rect)
+                    if drawnNodes[(int(i / cellSize), int(j / cellSize))] == 2:
+                        rect = pygame.rect.Rect((i+ widthOffsetToCenter, j), (cellSize - 2, cellSize - 2))
+                        pygame.draw.rect(screen, (0,255,0), rect)
                         nodes[(int(i / cellSize), int(j / cellSize))] = rect
-                    elif drawnNodes[(int(i / cellSize), int(j / cellSize))] == 3:
-                        rect = pygame.rect.Rect((i, j), (cellSize - 2, cellSize - 2))
-                        pygame.draw.rect(screen, (255, 0, 0), rect)
+                    if drawnNodes[(int(i / cellSize), int(j / cellSize))] == 3:
+                        rect = pygame.rect.Rect((i+ widthOffsetToCenter, j), (cellSize - 2, cellSize - 2))
+                        pygame.draw.rect(screen, (255,0,0), rect)
+                        nodes[(int(i / cellSize), int(j / cellSize))] = rect
+                    if drawnNodes[(int(i / cellSize), int(j / cellSize))] == 4:
+                        rect = pygame.rect.Rect((i + widthOffsetToCenter, j), (cellSize - 2, cellSize - 2))
+                        pygame.draw.rect(screen, (0, 255, 255), rect)
                         nodes[(int(i / cellSize), int(j / cellSize))] = rect
 
-            if (visualizeButton.x <= pygame.mouse.get_pos()[0] <= (visualizeButton.x + visualizeButton.width) and visualizeButton.y <= pygame.mouse.get_pos()[1] <= (visualizeButton.y + visualizeButton.height)) and pygame.mouse.get_pressed()[0] == True:
-                print('visualize clicked')
+            visualizeButton = pygame.rect.Rect((int(pygame.display.get_window_size()[0] / 2) - 50, 10), (100, 30))
+            pygame.draw.rect(screen, (70, 40, 100), visualizeButton)
+            font = pygame.font.SysFont(None, 15)
+            img = font.render('Click To Start', True, (225, 255, 255))
+            screen.blit(img, (int(visualizeButton.x) + int(visualizeButton.width / 2) - 35,
+                              int(visualizeButton.y) + int(visualizeButton.height / 2) - 12))
+
+            if (visualizeButton.x <= pygame.mouse.get_pos()[0] <= (visualizeButton.x + visualizeButton.width) and visualizeButton.y <= pygame.mouse.get_pos()[1] <= (visualizeButton.y + visualizeButton.height)) and event.type==MOUSEBUTTONUP:
+                completedNodes, path = dijkstras(nodes, startIndex, endIndex, (int(maxScreenWidth/cellSize)-1, int(maxScreenHeight/cellSize)-1))
+                for node in completedNodes:
+                    if node in drawnNodes and drawnNodes[node] != 2 and drawnNodes[node] != 3:
+                        drawnNodes[node] = 4
+                        rect = pygame.rect.Rect((20*node[0], 20*node[1]), (cellSize - 2, cellSize - 2))
+                        pygame.draw.rect(screen, (0, 255, 255), rect)
+                        nodes[(int(i / cellSize), int(j / cellSize))] = rect
+                        pygame.display.flip()
+                        time.sleep(0.005)
+                while len(path):
+                    node = path.pop()
+                    rect = pygame.rect.Rect((20 * node[0], 20 * node[1]), (cellSize - 2, cellSize - 2))
+                    pygame.draw.rect(screen, (255, 0, 255), rect)
+                    pygame.display.flip()
+                    time.sleep(0.005)
+                pygame.display.flip()
                 continue
-            if (pygame.mouse.get_pressed()[0] or pygame.mouse.get_pressed()[2] == True) and (pygame.mouse.get_pos()[1] <= 60 or pygame.mouse.get_pos()[1] >= maxScreenHeight or pygame.mouse.get_pos()[0] >= maxScreenWidth):
+            if pygame.mouse.get_pos()[1] >= maxScreenHeight or pygame.mouse.get_pos()[0] >= maxScreenWidth:
                 continue
             if pygame.mouse.get_pressed()[0] == True:
-                if  drawnNodes[
+                if drawnNodes[
                         (int(pygame.mouse.get_pos()[0] / cellSize), int(pygame.mouse.get_pos()[1] / cellSize))] == 2 or  drawnNodes[
                         (int(pygame.mouse.get_pos()[0] / cellSize), int(pygame.mouse.get_pos()[1] / cellSize))] == 3:
                     continue
                 if placeStart == True:
+                    xOffset = int(pygame.mouse.get_pos()[0] / cellSize)
+                    yOffset = int(pygame.mouse.get_pos()[1] / cellSize)
+                    print(xOffset, yOffset)
                     pygame.draw.rect(screen, (0, 255, 0), nodes[(xOffset, yOffset)])
                     drawnNodes[
                         (int(pygame.mouse.get_pos()[0] / cellSize), int(pygame.mouse.get_pos()[1] / cellSize))] = 2
+                    startIndex = (int(pygame.mouse.get_pos()[0] / cellSize), int(pygame.mouse.get_pos()[1] / cellSize))
                     placeStart = False
                     continue
                 elif placeEnd == True:
+                    xOffset = int(pygame.mouse.get_pos()[0] / cellSize)
+                    yOffset = int(pygame.mouse.get_pos()[1] / cellSize)
                     pygame.draw.rect(screen, (255, 0, 0), nodes[(xOffset, yOffset)])
                     drawnNodes[
                         (int(pygame.mouse.get_pos()[0] / cellSize), int(pygame.mouse.get_pos()[1] / cellSize))] = 3
+                    endIndex =  (int(pygame.mouse.get_pos()[0] / cellSize), int(pygame.mouse.get_pos()[1] / cellSize))
                     placeEnd = False
                     continue
                 xOffset = int(pygame.mouse.get_pos()[0]/cellSize)
                 yOffset = int(pygame.mouse.get_pos()[1]/cellSize)
                 pygame.draw.rect(screen, (128,128,128), nodes[(xOffset,yOffset)])
                 drawnNodes[(int(pygame.mouse.get_pos()[0]/cellSize),int(pygame.mouse.get_pos()[1]/cellSize))] = 1
+            if placeStart or placeEnd:
+                pygame.display.flip()
+                continue
             if pygame.mouse.get_pressed()[2] == True:
                 xOffset = int(pygame.mouse.get_pos()[0] / cellSize)
                 yOffset = int(pygame.mouse.get_pos()[1] / cellSize)
-                if drawnNodes[(int(pygame.mouse.get_pos()[0]/ cellSize), int(pygame.mouse.get_pos()[1] / cellSize))] == 2:
-                    print('place start set to true')
-                    placeStart = True
-                    pygame.draw.rect(screen, (255, 255, 255), nodes[(xOffset, yOffset)])
-                    drawnNodes[(int(pygame.mouse.get_pos()[0] / cellSize), int(pygame.mouse.get_pos()[1] / cellSize))] = 0
-                    continue
-                elif drawnNodes[
-                    (int(pygame.mouse.get_pos()[0] / cellSize), int(pygame.mouse.get_pos()[1] / cellSize))] == 3:
-                    placeEnd = True
-                    pygame.draw.rect(screen, (255, 255, 255), nodes[(xOffset, yOffset)])
-                    drawnNodes[
-                        (int(pygame.mouse.get_pos()[0] / cellSize), int(pygame.mouse.get_pos()[1] / cellSize))] = 0
-                    continue
                 pygame.draw.rect(screen, (255, 255, 255), nodes[(xOffset, yOffset)])
+                if drawnNodes[(xOffset, yOffset)] == 2:
+                    placeStart = True
+                    drawnNodes[(xOffset, yOffset)] = 0
+                    continue
+                elif drawnNodes[(xOffset, yOffset)] == 3:
+                    placeEnd = True
+                    drawnNodes[(xOffset, yOffset)] = 0
+                    continue
+                drawnNodes[(xOffset, yOffset)] = 0
                 drawnNodes[(int(pygame.mouse.get_pos()[0]/ cellSize), int(pygame.mouse.get_pos()[1] / cellSize))] = 0
-            if placeStart or placeEnd:
-                continue
             placeStart = False
             placeEnd = False
             visualize = False
