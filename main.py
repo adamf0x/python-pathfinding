@@ -70,86 +70,46 @@ class TreeNode:
             self.right.PrintTree()
 
 def dijkstras(nodes, startNode, endNode, dimensions):
-    completedNodes = {}
-    shortestPathToFinishFromStart = []
-    distanceToNodes = {}
-    for node in nodes:
-        xIndex, yIndex = int(nodes[node].x/cellSize), int(nodes[node].y/cellSize)
-        distanceToNodes[(xIndex, yIndex)] = float('inf')
-    distanceToNodes[startNode] = 0
-    while len(completedNodes) != len(nodes):
-        minDistanceNodeIndex = None
-        min = float('inf')
-        for distanceToNodesIndex in distanceToNodes:
-            if distanceToNodesIndex not in completedNodes:
-                if distanceToNodes[distanceToNodesIndex] < min:
-                    min = distanceToNodes[distanceToNodesIndex]
-                    minDistanceNodeIndex = distanceToNodesIndex
-        if minDistanceNodeIndex == endNode:
-            completedNodes[minDistanceNodeIndex] = distanceToNodes[minDistanceNodeIndex]
-            break
-        adjacentNodes = []
-        if minDistanceNodeIndex[0] > 0 and minDistanceNodeIndex[0] < dimensions[0] and minDistanceNodeIndex[1] < dimensions[1] and minDistanceNodeIndex[1] > 0:
-            adjacentNodes.append((minDistanceNodeIndex[0]-1, minDistanceNodeIndex[1]))
-            adjacentNodes.append((minDistanceNodeIndex[0]-1, minDistanceNodeIndex[1]-1))
-            adjacentNodes.append((minDistanceNodeIndex[0], minDistanceNodeIndex[1] - 1))
-            adjacentNodes.append((minDistanceNodeIndex[0] + 1, minDistanceNodeIndex[1]))
-            adjacentNodes.append((minDistanceNodeIndex[0] + 1, minDistanceNodeIndex[1]+1))
-            adjacentNodes.append((minDistanceNodeIndex[0], minDistanceNodeIndex[1] + 1))
-            adjacentNodes.append((minDistanceNodeIndex[0]-1, minDistanceNodeIndex[1] + 1))
-            adjacentNodes.append((minDistanceNodeIndex[0] + 1, minDistanceNodeIndex[1] - 1))
-        elif minDistanceNodeIndex[0] == 0 and minDistanceNodeIndex[1] == 0:
-            adjacentNodes.append((minDistanceNodeIndex[0] + 1, minDistanceNodeIndex[1]))
-            adjacentNodes.append((minDistanceNodeIndex[0] + 1, minDistanceNodeIndex[1] + 1))
-            adjacentNodes.append((minDistanceNodeIndex[0], minDistanceNodeIndex[1] + 1))
-        elif minDistanceNodeIndex[0] == 0 and minDistanceNodeIndex[1] == dimensions[1]:
-            adjacentNodes.append((minDistanceNodeIndex[0] + 1, minDistanceNodeIndex[1]))
-            adjacentNodes.append((minDistanceNodeIndex[0] + 1, minDistanceNodeIndex[1] + 1))
-            adjacentNodes.append((minDistanceNodeIndex[0], minDistanceNodeIndex[1] - 1))
-        elif minDistanceNodeIndex[0] == dimensions[0] and minDistanceNodeIndex[1] == 0:
-            adjacentNodes.append((minDistanceNodeIndex[0] - 1, minDistanceNodeIndex[1]))
-            adjacentNodes.append((minDistanceNodeIndex[0] - 1, minDistanceNodeIndex[1] +1))
-            adjacentNodes.append((minDistanceNodeIndex[0], minDistanceNodeIndex[1] + 1))
-        elif minDistanceNodeIndex[0] == dimensions[0] and minDistanceNodeIndex[1] == dimensions[1]:
-            adjacentNodes.append((minDistanceNodeIndex[0] - 1, minDistanceNodeIndex[1]))
-            adjacentNodes.append((minDistanceNodeIndex[0] - 1, minDistanceNodeIndex[1] - 1))
-            adjacentNodes.append((minDistanceNodeIndex[0], minDistanceNodeIndex[1] - 1))
-        elif minDistanceNodeIndex[1] == dimensions[1]:
-            adjacentNodes.append((minDistanceNodeIndex[0] - 1, minDistanceNodeIndex[1]))
-            adjacentNodes.append((minDistanceNodeIndex[0] - 1, minDistanceNodeIndex[1] - 1))
-            adjacentNodes.append((minDistanceNodeIndex[0] + 1, minDistanceNodeIndex[1]))
-            adjacentNodes.append((minDistanceNodeIndex[0] + 1, minDistanceNodeIndex[1] - 1))
-            adjacentNodes.append((minDistanceNodeIndex[0], minDistanceNodeIndex[1] - 1))
-        elif minDistanceNodeIndex[0] == 0:
-            adjacentNodes.append((minDistanceNodeIndex[0] + 1, minDistanceNodeIndex[1]))
-            adjacentNodes.append((minDistanceNodeIndex[0], minDistanceNodeIndex[1] - 1))
-            adjacentNodes.append((minDistanceNodeIndex[0] + 1, minDistanceNodeIndex[1] -1))
-            adjacentNodes.append((minDistanceNodeIndex[0], minDistanceNodeIndex[1] + 1))
-            adjacentNodes.append((minDistanceNodeIndex[0]+1, minDistanceNodeIndex[1] + 1))
-        elif minDistanceNodeIndex[0] == dimensions[0]:
-            adjacentNodes.append((minDistanceNodeIndex[0] - 1, minDistanceNodeIndex[1]))
-            adjacentNodes.append((minDistanceNodeIndex[0], minDistanceNodeIndex[1] + 1))
-            adjacentNodes.append((minDistanceNodeIndex[0] - 1, minDistanceNodeIndex[1] + 1))
-            adjacentNodes.append((minDistanceNodeIndex[0], minDistanceNodeIndex[1] - 1))
-            adjacentNodes.append((minDistanceNodeIndex[0] - 1, minDistanceNodeIndex[1] - 1))
-        elif minDistanceNodeIndex[0] > 0 and minDistanceNodeIndex[1] == 0:
-            adjacentNodes.append((minDistanceNodeIndex[0] - 1, minDistanceNodeIndex[1]))
-            adjacentNodes.append((minDistanceNodeIndex[0] - 1, minDistanceNodeIndex[1] + 1))
-            adjacentNodes.append((minDistanceNodeIndex[0] + 1, minDistanceNodeIndex[1]))
-            adjacentNodes.append((minDistanceNodeIndex[0] + 1, minDistanceNodeIndex[1] + 1))
-            adjacentNodes.append((minDistanceNodeIndex[0], minDistanceNodeIndex[1] + 1))
-        for adjacentNodeIndex in adjacentNodes:
-            if adjacentNodeIndex not in completedNodes:
-                if minDistanceNodeIndex[0] != adjacentNodeIndex[0] and minDistanceNodeIndex[1] != adjacentNodeIndex[1]:
-                    distanceToNodes[adjacentNodeIndex] = distanceToNodes[minDistanceNodeIndex] + 2
-                else:
-                    distanceToNodes[adjacentNodeIndex] = distanceToNodes[minDistanceNodeIndex] + 1
-        completedNodes[minDistanceNodeIndex] = distanceToNodes[minDistanceNodeIndex]
-        # for distanceIndex in distanceToNodes:
-        #     if distanceToNodes[distanceIndex] != float('inf') and distanceIndex not in shortestPathNodes:
-        #         print(distanceIndex, distanceToNodes[distanceIndex])
-        # print()
-    return completedNodes, shortestPathToFinishFromStart
+    shortestPathNodes = {}
+    uncompletedNodes = nodes
+    prev = None
+    for i in uncompletedNodes:
+        uncompletedNodes[i] = float('inf')
+    uncompletedNodes[startNode] = 0
+    while len(list(shortestPathNodes.keys())) != len(list(uncompletedNodes.keys())):
+        uncompletedNodes = {k: v for k, v in sorted(uncompletedNodes.items(), key=lambda item: item[1])}
+        for j in list(uncompletedNodes.keys()):
+            if j not in shortestPathNodes:
+                curr = j
+                break
+        if curr == endNode:
+            shortestPathNodes[curr] =[uncompletedNodes[curr], prev]
+            return shortestPathNodes
+        walkableNodes = []
+        if curr[0] > 0:
+            walkableNodes.append((curr[0]-1, curr[1]))
+        if curr[1] > 0:
+            walkableNodes.append((curr[0], curr[1]-1))
+        if curr[0] > 0 and curr[1] > 0:
+            walkableNodes.append((curr[0]-1, curr[1]-1))
+        if curr[0] < dimensions[0]:
+            walkableNodes.append((curr[0]+1, curr[1]))
+        if curr[1] < dimensions[1]:
+            walkableNodes.append((curr[0], curr[1]+1))
+        if curr[0] < dimensions[0] and curr[1] < dimensions[1]:    
+            walkableNodes.append((curr[0]+1, curr[1]+1))
+        if curr[0] > 0 and curr[1] < dimensions[1]:
+            walkableNodes.append((curr[0]-1, curr[1]+1))
+        if curr[0] < dimensions[0] and curr[1] > 0:
+            walkableNodes.append((curr[0]+1, curr[1]-1))
+
+        for node in walkableNodes: 
+            if uncompletedNodes[node] > uncompletedNodes[curr] + 1:
+                uncompletedNodes[node] = uncompletedNodes[curr] + 1
+        shortestPathNodes[curr] = [uncompletedNodes[curr], prev]
+        prev = curr
+    return shortestPathNodes
+        
 if __name__ == "__main__":
     windowSize = width, height = (500, 500)
     pygame.init()
@@ -217,10 +177,16 @@ if __name__ == "__main__":
             img = font.render('Click To Start', True, (225, 255, 255))
             screen.blit(img, (int(visualizeButton.x) + int(visualizeButton.width / 2) - 35,
                               int(visualizeButton.y) + int(visualizeButton.height / 2) - 12))
-
             if (visualizeButton.x <= pygame.mouse.get_pos()[0] <= (visualizeButton.x + visualizeButton.width) and visualizeButton.y <= pygame.mouse.get_pos()[1] <= (visualizeButton.y + visualizeButton.height)) and event.type==MOUSEBUTTONUP:
-                completedNodes, path = dijkstras(nodes, startIndex, endIndex, (int(maxScreenWidth/cellSize)-1, int(maxScreenHeight/cellSize)-1))
-                for node in completedNodes:
+                for i in range(0, maxScreenWidth, cellSize):
+                    for j in range(0, maxScreenHeight, cellSize):
+                        if drawnNodes[(int(i / cellSize), int(j / cellSize))] == 4:
+                            rect = pygame.rect.Rect((i + widthOffsetToCenter, j), (cellSize - 2, cellSize - 2))
+                            pygame.draw.rect(screen, (255, 255, 255), rect)
+                            nodes[(int(i / cellSize), int(j / cellSize))] = rect
+                            drawnNodes[(int(i / cellSize), int(j / cellSize))] = 0
+                shortestPathNodes = dijkstras(nodes, startIndex, endIndex, ((int(maxScreenWidth/cellSize))-1, int(maxScreenHeight/cellSize)-1))
+                for node in shortestPathNodes:
                     if node in drawnNodes and drawnNodes[node] != 2 and drawnNodes[node] != 3:
                         drawnNodes[node] = 4
                         rect = pygame.rect.Rect((20*node[0], 20*node[1]), (cellSize - 2, cellSize - 2))
@@ -228,12 +194,6 @@ if __name__ == "__main__":
                         nodes[(int(i / cellSize), int(j / cellSize))] = rect
                         pygame.display.flip()
                         time.sleep(0.005)
-                while len(path):
-                    node = path.pop()
-                    rect = pygame.rect.Rect((20 * node[0], 20 * node[1]), (cellSize - 2, cellSize - 2))
-                    pygame.draw.rect(screen, (255, 0, 255), rect)
-                    pygame.display.flip()
-                    time.sleep(0.005)
                 pygame.display.flip()
                 continue
             if pygame.mouse.get_pos()[1] >= maxScreenHeight or pygame.mouse.get_pos()[0] >= maxScreenWidth:
