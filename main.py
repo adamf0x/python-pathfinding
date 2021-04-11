@@ -84,25 +84,26 @@ def dijkstras(nodes, startNode, endNode, dimensions):
                 break
         if curr == endNode:
             shortestPathNodes[curr] =[uncompletedNodes[curr], prev]
+            print(shortestPathNodes)
             return shortestPathNodes
+        
         walkableNodes = []
         if curr[0] > 0:
             walkableNodes.append((curr[0]-1, curr[1]))
         if curr[1] > 0:
             walkableNodes.append((curr[0], curr[1]-1))
-        if curr[0] > 0 and curr[1] > 0:
-            walkableNodes.append((curr[0]-1, curr[1]-1))
         if curr[0] < dimensions[0]:
             walkableNodes.append((curr[0]+1, curr[1]))
         if curr[1] < dimensions[1]:
-            walkableNodes.append((curr[0], curr[1]+1))
-        if curr[0] < dimensions[0] and curr[1] < dimensions[1]:    
-            walkableNodes.append((curr[0]+1, curr[1]+1))
-        if curr[0] > 0 and curr[1] < dimensions[1]:
-            walkableNodes.append((curr[0]-1, curr[1]+1))
-        if curr[0] < dimensions[0] and curr[1] > 0:
-            walkableNodes.append((curr[0]+1, curr[1]-1))
-
+            walkableNodes.append((curr[0], curr[1]+1))    
+        # if curr[0] > 0 and curr[1] > 0:
+        #     walkableNodes.append((curr[0]-1, curr[1]-1))
+        # if curr[0] < dimensions[0] and curr[1] < dimensions[1]:    
+        #     walkableNodes.append((curr[0]+1, curr[1]+1))
+        # if curr[0] > 0 and curr[1] < dimensions[1]:
+        #     walkableNodes.append((curr[0]-1, curr[1]+1))
+        # if curr[0] < dimensions[0] and curr[1] > 0:
+        #     walkableNodes.append((curr[0]+1, curr[1]-1))
         for node in walkableNodes: 
             if uncompletedNodes[node] > uncompletedNodes[curr] + 1:
                 uncompletedNodes[node] = uncompletedNodes[curr] + 1
@@ -170,6 +171,10 @@ if __name__ == "__main__":
                         rect = pygame.rect.Rect((i + widthOffsetToCenter, j), (cellSize - 2, cellSize - 2))
                         pygame.draw.rect(screen, (0, 255, 255), rect)
                         nodes[(int(i / cellSize), int(j / cellSize))] = rect
+                    if drawnNodes[(int(i / cellSize), int(j / cellSize))] == 5:
+                        rect = pygame.rect.Rect((i + widthOffsetToCenter, j), (cellSize - 2, cellSize - 2))
+                        pygame.draw.rect(screen, (255, 0, 255), rect)
+                        nodes[(int(i / cellSize), int(j / cellSize))] = rect
 
             visualizeButton = pygame.rect.Rect((int(pygame.display.get_window_size()[0] / 2) - 50, 10), (100, 30))
             pygame.draw.rect(screen, (70, 40, 100), visualizeButton)
@@ -186,6 +191,7 @@ if __name__ == "__main__":
                             nodes[(int(i / cellSize), int(j / cellSize))] = rect
                             drawnNodes[(int(i / cellSize), int(j / cellSize))] = 0
                 shortestPathNodes = dijkstras(nodes, startIndex, endIndex, ((int(maxScreenWidth/cellSize))-1, int(maxScreenHeight/cellSize)-1))
+                pathNode = endIndex
                 for node in shortestPathNodes:
                     if node in drawnNodes and drawnNodes[node] != 2 and drawnNodes[node] != 3:
                         drawnNodes[node] = 4
@@ -194,6 +200,11 @@ if __name__ == "__main__":
                         nodes[(int(i / cellSize), int(j / cellSize))] = rect
                         pygame.display.flip()
                         time.sleep(0.005)
+                while pathNode != None:
+                    rect = pygame.rect.Rect((20*pathNode[0], 20*pathNode[1]), (cellSize - 2, cellSize - 2))
+                    pygame.draw.rect(screen, (255, 0, 255), rect)
+                    pygame.display.flip()
+                    pathNode = shortestPathNodes[pathNode][1]
                 pygame.display.flip()
                 continue
             if pygame.mouse.get_pos()[1] >= maxScreenHeight or pygame.mouse.get_pos()[0] >= maxScreenWidth:
