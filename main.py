@@ -91,7 +91,6 @@ def dijkstras(nodes, startNode, endNode, dimensions, drawnNodes):
                 break
         if curr == endNode:
             shortestPathNodes[curr] = uncompletedNodes[curr]
-            print(shortestPathNodes)
             return shortestPathNodes
         walkableNodes = []
         if curr[0] > 0 and drawnNodes[(curr[0]-1, curr[1])] != 1:
@@ -205,7 +204,15 @@ if __name__ == "__main__":
                             drawnNodes[(int(i / cellSize), int(j / cellSize))] = 0
                 shortestPathNodes = dijkstras(nodes, startIndex, endIndex, ((int(maxScreenWidth/cellSize))-1, int(maxScreenHeight/cellSize)-1), drawnNodes)
                 if not shortestPathNodes:
-                    print('failed to find end node')
+                    visualizeButton = pygame.rect.Rect((maxScreenWidth/2 - 140, maxScreenHeight/2 - 10),
+                                                       (280, 30))
+                    pygame.draw.rect(screen, (255, 255, 255), visualizeButton)
+                    font = pygame.font.SysFont(None, 30)
+                    img = font.render('End node could not be found', True, (255, 0, 0))
+                    screen.blit(img, (maxScreenWidth/2 - 140,
+                                      maxScreenHeight/2))
+                    pygame.display.flip()
+                    time.sleep(2)
                     continue
                 for node in shortestPathNodes:
                     if node in drawnNodes and drawnNodes[node] != 2 and drawnNodes[node] != 3:
@@ -224,11 +231,6 @@ if __name__ == "__main__":
                         pygame.display.flip()
                         time.sleep(0.05)
                     pathNode = shortestPathNodes[pathNode]['prevNode']
-                # while pathNode != None:
-                #     rect = pygame.rect.Rect((20*pathNode[0], 20*pathNode[1]), (cellSize - 2, cellSize - 2))
-                #     pygame.draw.rect(screen, (255, 0, 255), rect)
-                #     pygame.display.flip()
-                #     pathNode = shortestPathNodes[pathNode][1]
                 pygame.display.flip()
                 continue
             if pygame.mouse.get_pos()[1] >= maxScreenHeight or pygame.mouse.get_pos()[0] >= maxScreenWidth:
