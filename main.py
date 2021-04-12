@@ -9,6 +9,8 @@ import time
 import pygame
 from pygame.locals import *
 
+from operator import *
+
 class Node:
 
     # Constructor to initialize the node object
@@ -69,46 +71,57 @@ class TreeNode:
         if self.right:
             self.right.PrintTree()
 
-def dijkstras(nodes, startNode, endNode, dimensions):
+
+def dijkstras(nodes, startNode, endNode, dimensions, drawnNodes):
     shortestPathNodes = {}
     uncompletedNodes = nodes
-    prev = None
     for i in uncompletedNodes:
-        uncompletedNodes[i] = float('inf')
-    uncompletedNodes[startNode] = 0
+        uncompletedNodes[i] = {'distanceFromStart': float('inf'), 'prevNode': None}
+    uncompletedNodes[startNode]['distanceFromStart'] = 0
     while len(list(shortestPathNodes.keys())) != len(list(uncompletedNodes.keys())):
-        uncompletedNodes = {k: v for k, v in sorted(uncompletedNodes.items(), key=lambda item: item[1])}
+        sortedList = sorted(uncompletedNodes.items(), key=lambda item: item[1]['distanceFromStart'])
+        uncompletedNodes = {}
+        for item in sortedList:
+            uncompletedNodes[item[0]] = item[1]
         for j in list(uncompletedNodes.keys()):
+            if uncompletedNodes[j]['distanceFromStart'] == float('inf'):
+                return
             if j not in shortestPathNodes:
                 curr = j
                 break
         if curr == endNode:
-            shortestPathNodes[curr] =[uncompletedNodes[curr], prev]
+            shortestPathNodes[curr] = uncompletedNodes[curr]
             print(shortestPathNodes)
             return shortestPathNodes
-        
         walkableNodes = []
-        if curr[0] > 0:
+        if curr[0] > 0 and drawnNodes[(curr[0]-1, curr[1])] != 1:
             walkableNodes.append((curr[0]-1, curr[1]))
-        if curr[1] > 0:
+        if curr[1] > 0 and drawnNodes[(curr[0], curr[1]-1)] != 1:
             walkableNodes.append((curr[0], curr[1]-1))
-        if curr[0] < dimensions[0]:
+        if curr[0] < dimensions[0] and drawnNodes[(curr[0]+1, curr[1])] != 1:
             walkableNodes.append((curr[0]+1, curr[1]))
-        if curr[1] < dimensions[1]:
+        if curr[1] < dimensions[1] and drawnNodes[(curr[0], curr[1]+1)] != 1:
             walkableNodes.append((curr[0], curr[1]+1))    
-        # if curr[0] > 0 and curr[1] > 0:
-        #     walkableNodes.append((curr[0]-1, curr[1]-1))
-        # if curr[0] < dimensions[0] and curr[1] < dimensions[1]:    
-        #     walkableNodes.append((curr[0]+1, curr[1]+1))
-        # if curr[0] > 0 and curr[1] < dimensions[1]:
-        #     walkableNodes.append((curr[0]-1, curr[1]+1))
-        # if curr[0] < dimensions[0] and curr[1] > 0:
-        #     walkableNodes.append((curr[0]+1, curr[1]-1))
-        for node in walkableNodes: 
-            if uncompletedNodes[node] > uncompletedNodes[curr] + 1:
-                uncompletedNodes[node] = uncompletedNodes[curr] + 1
-        shortestPathNodes[curr] = [uncompletedNodes[curr], prev]
-        prev = curr
+        if curr[0] > 0 and curr[1] > 0 and drawnNodes[(curr[0]-1, curr[1]-1)] != 1:
+            walkableNodes.append((curr[0]-1, curr[1]-1))
+        if curr[0] < dimensions[0] and curr[1] < dimensions[1] and drawnNodes[(curr[0]+1, curr[1]+1)] != 1:    
+            walkableNodes.append((curr[0]+1, curr[1]+1))
+        if curr[0] > 0 and curr[1] < dimensions[1] and drawnNodes[(curr[0]-1, curr[1]+1)] != 1:
+            walkableNodes.append((curr[0]-1, curr[1]+1))
+        if curr[0] < dimensions[0] and curr[1] > 0 and drawnNodes[(curr[0]+1, curr[1]-1)] != 1:
+            walkableNodes.append((curr[0]+1, curr[1]-1))
+        for node in walkableNodes:
+            if node in shortestPathNodes:
+                walkableNodes.remove(node)
+       
+        for node in walkableNodes:
+            if node[1] == curr[1] or node[0] == curr[0]:
+                if uncompletedNodes[node]['distanceFromStart'] > uncompletedNodes[curr]['distanceFromStart'] + 1:
+                    uncompletedNodes[node] = {'distanceFromStart': uncompletedNodes[curr]['distanceFromStart'] + 1,'prevNode': curr}
+            else:
+                if uncompletedNodes[node]['distanceFromStart'] > uncompletedNodes[curr]['distanceFromStart'] + 2:
+                    uncompletedNodes[node] = {'distanceFromStart': uncompletedNodes[curr]['distanceFromStart'] + 2,'prevNode': curr}
+        shortestPathNodes[curr] = uncompletedNodes[curr]
     return shortestPathNodes
         
 if __name__ == "__main__":
@@ -185,26 +198,37 @@ if __name__ == "__main__":
             if (visualizeButton.x <= pygame.mouse.get_pos()[0] <= (visualizeButton.x + visualizeButton.width) and visualizeButton.y <= pygame.mouse.get_pos()[1] <= (visualizeButton.y + visualizeButton.height)) and event.type==MOUSEBUTTONUP:
                 for i in range(0, maxScreenWidth, cellSize):
                     for j in range(0, maxScreenHeight, cellSize):
-                        if drawnNodes[(int(i / cellSize), int(j / cellSize))] == 4:
+                        if drawnNodes[(int(i / cellSize), int(j / cellSize))] == 4 or drawnNodes[(int(i / cellSize), int(j / cellSize))] == 5:
                             rect = pygame.rect.Rect((i + widthOffsetToCenter, j), (cellSize - 2, cellSize - 2))
                             pygame.draw.rect(screen, (255, 255, 255), rect)
                             nodes[(int(i / cellSize), int(j / cellSize))] = rect
                             drawnNodes[(int(i / cellSize), int(j / cellSize))] = 0
-                shortestPathNodes = dijkstras(nodes, startIndex, endIndex, ((int(maxScreenWidth/cellSize))-1, int(maxScreenHeight/cellSize)-1))
-                pathNode = endIndex
+                shortestPathNodes = dijkstras(nodes, startIndex, endIndex, ((int(maxScreenWidth/cellSize))-1, int(maxScreenHeight/cellSize)-1), drawnNodes)
+                if not shortestPathNodes:
+                    print('failed to find end node')
+                    continue
                 for node in shortestPathNodes:
                     if node in drawnNodes and drawnNodes[node] != 2 and drawnNodes[node] != 3:
                         drawnNodes[node] = 4
-                        rect = pygame.rect.Rect((20*node[0], 20*node[1]), (cellSize - 2, cellSize - 2))
+                        rect = pygame.rect.Rect((20*node[0] + widthOffsetToCenter, 20*node[1]), (cellSize - 2, cellSize - 2))
                         pygame.draw.rect(screen, (0, 255, 255), rect)
                         nodes[(int(i / cellSize), int(j / cellSize))] = rect
                         pygame.display.flip()
                         time.sleep(0.005)
+                pathNode = endIndex
                 while pathNode != None:
-                    rect = pygame.rect.Rect((20*pathNode[0], 20*pathNode[1]), (cellSize - 2, cellSize - 2))
-                    pygame.draw.rect(screen, (255, 0, 255), rect)
-                    pygame.display.flip()
-                    pathNode = shortestPathNodes[pathNode][1]
+                    if drawnNodes[pathNode] != 2 and drawnNodes[pathNode] != 3:
+                        drawnNodes[pathNode] = 5
+                        rect = pygame.rect.Rect((20*pathNode[0] + widthOffsetToCenter, 20*pathNode[1]), (cellSize - 2, cellSize - 2))
+                        pygame.draw.rect(screen, (255, 0, 255), rect)
+                        pygame.display.flip()
+                        time.sleep(0.05)
+                    pathNode = shortestPathNodes[pathNode]['prevNode']
+                # while pathNode != None:
+                #     rect = pygame.rect.Rect((20*pathNode[0], 20*pathNode[1]), (cellSize - 2, cellSize - 2))
+                #     pygame.draw.rect(screen, (255, 0, 255), rect)
+                #     pygame.display.flip()
+                #     pathNode = shortestPathNodes[pathNode][1]
                 pygame.display.flip()
                 continue
             if pygame.mouse.get_pos()[1] >= maxScreenHeight or pygame.mouse.get_pos()[0] >= maxScreenWidth:
