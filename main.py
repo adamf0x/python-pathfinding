@@ -95,19 +95,19 @@ def dijkstras(nodes, startNode, endNode, dimensions, drawnNodes):
         walkableNodes = []
         if curr[0] > 0 and drawnNodes[(curr[0]-1, curr[1])] != 1:
             walkableNodes.append((curr[0]-1, curr[1]))
-        if curr[1] > 0 and drawnNodes[(curr[0], curr[1]-1)] != 1:
+        if curr[1] > 3 and drawnNodes[(curr[0], curr[1]-1)] != 1:
             walkableNodes.append((curr[0], curr[1]-1))
         if curr[0] < dimensions[0] and drawnNodes[(curr[0]+1, curr[1])] != 1:
             walkableNodes.append((curr[0]+1, curr[1]))
         if curr[1] < dimensions[1] and drawnNodes[(curr[0], curr[1]+1)] != 1:
             walkableNodes.append((curr[0], curr[1]+1))    
-        if curr[0] > 0 and curr[1] > 0 and drawnNodes[(curr[0]-1, curr[1]-1)] != 1:
+        if curr[0] > 0 and curr[1] > 3 and drawnNodes[(curr[0]-1, curr[1]-1)] != 1:
             walkableNodes.append((curr[0]-1, curr[1]-1))
         if curr[0] < dimensions[0] and curr[1] < dimensions[1] and drawnNodes[(curr[0]+1, curr[1]+1)] != 1:    
             walkableNodes.append((curr[0]+1, curr[1]+1))
         if curr[0] > 0 and curr[1] < dimensions[1] and drawnNodes[(curr[0]-1, curr[1]+1)] != 1:
             walkableNodes.append((curr[0]-1, curr[1]+1))
-        if curr[0] < dimensions[0] and curr[1] > 0 and drawnNodes[(curr[0]+1, curr[1]-1)] != 1:
+        if curr[0] < dimensions[0] and curr[1] > 3 and drawnNodes[(curr[0]+1, curr[1]-1)] != 1:
             walkableNodes.append((curr[0]+1, curr[1]-1))
         for node in walkableNodes:
             if node in shortestPathNodes:
@@ -135,9 +135,9 @@ if __name__ == "__main__":
     cellSize = 20
     maxScreenWidth = pygame.display.get_window_size()[0]
     maxScreenHeight = pygame.display.get_window_size()[1]
-    drawnNodes[(0, 0)] = 2
+    drawnNodes[(0, 3)] = 2
     drawnNodes[(int(maxScreenWidth / cellSize) - 1, int(maxScreenHeight / cellSize) - 1)] = 3
-    startIndex = (0,0)
+    startIndex = (0,3)
     endIndex = ((int(maxScreenWidth / cellSize) - 1, int(maxScreenHeight / cellSize) - 1))
     screenSizeChange = True
     placeStart = False
@@ -160,7 +160,7 @@ if __name__ == "__main__":
                     maxScreenHeight = pygame.display.get_window_size()[1] - pygame.display.get_window_size()[1] % cellSize
             nodes = {}
             for i in range(0, maxScreenWidth, cellSize):
-                for j in range(0, maxScreenHeight, cellSize):
+                for j in range(60, maxScreenHeight, cellSize):
                     if (int(i / cellSize), int(j / cellSize)) not in drawnNodes:
                         drawnNodes[(int(i/ cellSize), int(j / cellSize))] = 0
                     if drawnNodes[(int(i / cellSize), int(j / cellSize))] == 0:
@@ -194,9 +194,21 @@ if __name__ == "__main__":
             img = font.render('Click To Start', True, (225, 255, 255))
             screen.blit(img, (int(visualizeButton.x) + int(visualizeButton.width / 2) - 35,
                               int(visualizeButton.y) + int(visualizeButton.height / 2) - 12))
+
+            clearButton = pygame.rect.Rect((int(pygame.display.get_window_size()[0] / 2) - 200, 10), (100, 30))
+            pygame.draw.rect(screen, (70, 40, 100), clearButton)
+            font = pygame.font.SysFont(None, 15)
+            img = font.render('Click To Reset', True, (225, 255, 255))
+            screen.blit(img, (int(clearButton.x) + int(clearButton.width / 2) - 35,
+                              int(clearButton.y) + int(clearButton.height / 2) - 12))
+            if (clearButton.x <= pygame.mouse.get_pos()[0] <= (
+                    clearButton.x + clearButton.width) and clearButton.y <= pygame.mouse.get_pos()[1] <= (
+                        clearButton.y + clearButton.height)) and event.type == MOUSEBUTTONUP:
+                for i in range(0, maxScreenWidth, cellSize):
+                    for j in range(60, maxScreenHeight, cellSize):
             if (visualizeButton.x <= pygame.mouse.get_pos()[0] <= (visualizeButton.x + visualizeButton.width) and visualizeButton.y <= pygame.mouse.get_pos()[1] <= (visualizeButton.y + visualizeButton.height)) and event.type==MOUSEBUTTONUP:
                 for i in range(0, maxScreenWidth, cellSize):
-                    for j in range(0, maxScreenHeight, cellSize):
+                    for j in range(60, maxScreenHeight, cellSize):
                         if drawnNodes[(int(i / cellSize), int(j / cellSize))] == 4 or drawnNodes[(int(i / cellSize), int(j / cellSize))] == 5:
                             rect = pygame.rect.Rect((i + widthOffsetToCenter, j), (cellSize - 2, cellSize - 2))
                             pygame.draw.rect(screen, (255, 255, 255), rect)
@@ -233,7 +245,7 @@ if __name__ == "__main__":
                     pathNode = shortestPathNodes[pathNode]['prevNode']
                 pygame.display.flip()
                 continue
-            if pygame.mouse.get_pos()[1] >= maxScreenHeight or pygame.mouse.get_pos()[0] >= maxScreenWidth:
+            if pygame.mouse.get_pos()[1] >= maxScreenHeight or pygame.mouse.get_pos()[0] >= maxScreenWidth or pygame.mouse.get_pos()[1] < 60:
                 continue
             if pygame.mouse.get_pressed()[0] == True:
                 if drawnNodes[
