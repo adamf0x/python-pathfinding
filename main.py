@@ -9,6 +9,8 @@ import time
 import pygame
 from pygame.locals import *
 
+import heapq
+
 from operator import *
 
 class Node:
@@ -71,26 +73,176 @@ class TreeNode:
         if self.right:
             self.right.PrintTree()
 
+def aStar(nodes, startNode, endNode, dimensions, drawnNodes):
+    gScores = {}
+    hScores = {}
+    openSet = nodes
+    fScores = []
+    scores = {}
+    infinity = 10000000000000000000000
+    for i in openSet:
+        scores[i] = {'fScore': infinity, 'hScore': infinity, 'gScore': infinity, 'parent': None}
+        heapq.heappush(fScores, (infinity, i))
+    for j in fScores:
+        if j[1] == startNode:
+            fScores.remove(j)
+            heapq.heappush(fScores, (0, startNode))
+            break
+    scores[startNode] = {'fScore': 0, 'hScore': 0, 'gScore': 0, 'parent': None}
 
+    current = heapq.heappop(fScores)[1]
+    path = []
+    searched = []
+    while current != endNode:
+        if current[0] > 0 and drawnNodes[(current[0]-1, current[1])] != 1:
+            curr = (current[0]-1, current[1])
+            searched.append(curr)
+            scores[curr]['parent'] = current
+            if 'parent' not in current or scores[current]['parent'] == None:
+                gScore = 1
+            else:
+                gScore = scores[scores[current]['parent']]['gScore'] + 1
+            hScore = abs(curr[0] - endNode[0]) + abs(curr[1]-endNode[1])
+            fScore = gScore + hScore
+            scores[curr] = {'fScore': fScore, 'hScore': hScore, 'gScore': gScore}
+            for j in fScores:
+                if j[1] == curr:
+                    fScores.remove(j)
+                    heapq.heappush(fScores, (fScore, j[1]))
+                    break
+        if current[1] > 3 and drawnNodes[(current[0], current[1]-1)] != 1:
+            curr = (current[0], current[1]-1)
+            searched.append(curr)
+            scores[curr]['parent'] = current
+            if 'parent' not in current or scores[current]['parent'] == None:
+                gScore = 1
+            else:
+                gScore = scores[scores[current]['parent']]['gScore'] + 1
+            hScore = abs(curr[0] - endNode[0]) + abs(curr[1] - endNode[1])
+            fScore = gScore + hScore
+            scores[curr] = {'fScore': fScore, 'hScore': hScore, 'gScore': gScore}
+            for j in fScores:
+                if j[1] == curr:
+                    fScores.remove(j)
+                    heapq.heappush(fScores, (fScore, j[1]))
+                    break
+        if current[0] < dimensions[0] and drawnNodes[(current[0] + 1, current[1])] != 1:
+            curr = (current[0] + 1, current[1])
+            searched.append(curr)
+            scores[curr]['parent'] = current
+            if 'parent' not in current or scores[current]['parent'] == None:
+                gScore = 1
+            else:
+                gScore = scores[scores[current]['parent']]['gScore'] + 1
+            hScore = abs(curr[0] - endNode[0]) + abs(curr[1]-endNode[1])
+            fScore = gScore + hScore
+            scores[curr] = {'fScore': fScore, 'hScore': hScore, 'gScore': gScore}
+            for j in fScores:
+                if j[1] == curr:
+                    fScores.remove(j)
+                    heapq.heappush(fScores, (fScore, j[1]))
+                    break
+        if current[1] < dimensions[1] and drawnNodes[(current[0], current[1] + 1)] != 1:
+            curr = (current[0], current[1] + 1)
+            searched.append(curr)
+            scores[curr]['parent'] = current
+            if 'parent' not in current or scores[current]['parent'] == None:
+                gScore = 1
+            else:
+                gScore = scores[scores[current]['parent']]['gScore'] + 1
+            hScore = abs(curr[0] - endNode[0]) + abs(curr[1]-endNode[1])
+            fScore = gScore + hScore
+            scores[curr] = {'fScore': fScore, 'hScore': hScore, 'gScore': gScore}
+            for j in fScores:
+                if j[1] == curr:
+                    fScores.remove(j)
+                    heapq.heappush(fScores, (fScore, j[1]))
+                    break
+        if current[0] > 0 and current[1] > 3 and drawnNodes[(current[0] - 1, current[1] - 1)] != 1:
+            curr = (current[0] - 1, current[1] - 1)
+            searched.append(curr)
+            scores[curr]['parent'] = current
+            if 'parent' not in current or scores[current]['parent'] == None:
+                gScore = 1
+            else:
+                gScore = scores[scores[current]['parent']]['gScore'] + 1
+            hScore = abs(curr[0] - endNode[0]) + abs(curr[1]-endNode[1])
+            fScore = gScore + hScore
+            scores[curr] = {'fScore': fScore, 'hScore': hScore, 'gScore': gScore}
+            for j in fScores:
+                if j[1] == curr:
+                    fScores.remove(j)
+                    heapq.heappush(fScores, (fScore, j[1]))
+                    break
+        if current[0] < dimensions[0] and current[1] < dimensions[1] and drawnNodes[(current[0] + 1, current[1] + 1)] != 1:
+            curr = (current[0] + 1, current[1] + 1)
+            searched.append(curr)
+            scores[curr]['parent'] = current
+            if 'parent' not in current or scores[current]['parent'] == None:
+                gScore = 1
+            else:
+                gScore = scores[scores[current]['parent']]['gScore'] + 1
+            hScore = abs(curr[0] - endNode[0]) + abs(curr[1] - endNode[1])
+            fScore = gScore + hScore
+            scores[curr] = {'fScore': fScore, 'hScore': hScore, 'gScore': gScore}
+            for j in fScores:
+                if j[1] == curr:
+                    fScores.remove(j)
+                    heapq.heappush(fScores, (fScore, j[1]))
+                    break
+        if current[0] > 0 and current[1] < dimensions[1] and drawnNodes[(current[0] - 1, current[1] + 1)] != 1:
+            curr = (current[0] - 1, current[1] + 1)
+            searched.append(curr)
+            scores[curr]['parent'] = current
+            if 'parent' not in current or scores[current]['parent'] == None:
+                gScore = 1
+            else:
+                gScore = scores[scores[current]['parent']]['gScore'] + 1
+            hScore = abs(curr[0] - endNode[0]) + abs(curr[1] - endNode[1])
+            fScore = gScore + hScore
+            scores[curr] = {'fScore': fScore, 'hScore': hScore, 'gScore': gScore}
+            for j in fScores:
+                if j[1] == curr:
+                    fScores.remove(j)
+                    heapq.heappush(fScores, (fScore, j[1]))
+                    break
+        if current[0] < dimensions[0] and current[1] > 3 and drawnNodes[(current[0] + 1, current[1] - 1)] != 1:
+            curr = (current[0] + 1, current[1] - 1)
+            searched.append(curr)
+            scores[curr]['parent'] = current
+            if 'parent' not in current or scores[current]['parent'] == None:
+                gScore = 1
+            else:
+                gScore = scores[scores[current]['parent']]['gScore'] + 1
+            hScore = abs(curr[0] - endNode[0]) + abs(curr[1]-endNode[1])
+            fScore = gScore + hScore
+            scores[curr] = {'fScore': fScore, 'hScore': hScore, 'gScore': gScore}
+            for j in fScores:
+                if j[1] == curr:
+                    fScores.remove(j)
+                    heapq.heappush(fScores, (fScore, j[1]))
+                    break
+        current = heapq.heappop(fScores)[1]
+    return searched, path
 def dijkstras(nodes, startNode, endNode, dimensions, drawnNodes):
     shortestPathNodes = {}
-    uncompletedNodes = nodes
-    for i in uncompletedNodes:
-        uncompletedNodes[i] = {'distanceFromStart': float('inf'), 'prevNode': None}
-    uncompletedNodes[startNode]['distanceFromStart'] = 0
-    while len(list(shortestPathNodes.keys())) != len(list(uncompletedNodes.keys())):
-        sortedList = sorted(uncompletedNodes.items(), key=lambda item: item[1]['distanceFromStart'])
-        uncompletedNodes = {}
+    incompleteNodes = nodes
+    for i in incompleteNodes:
+        incompleteNodes[i] = {'distanceFromStart': float('inf'), 'prevNode': None}
+    incompleteNodes[startNode]['distanceFromStart'] = 0
+    while len(list(shortestPathNodes.keys())) != len(list(incompleteNodes.keys())):
+        sortedList = sorted(incompleteNodes.items(), key=lambda item: item[1]['distanceFromStart'])
+        incompleteNodes = {}
         for item in sortedList:
-            uncompletedNodes[item[0]] = item[1]
-        for j in list(uncompletedNodes.keys()):
-            if uncompletedNodes[j]['distanceFromStart'] == float('inf'):
+            incompleteNodes[item[0]] = item[1]
+        for j in list(incompleteNodes.keys()):
+            if incompleteNodes[j]['distanceFromStart'] == float('inf'):
                 return
             if j not in shortestPathNodes:
                 curr = j
                 break
         if curr == endNode:
-            shortestPathNodes[curr] = uncompletedNodes[curr]
+            shortestPathNodes[curr] = incompleteNodes[curr]
             return shortestPathNodes
         walkableNodes = []
         if curr[0] > 0 and drawnNodes[(curr[0]-1, curr[1])] != 1:
@@ -115,12 +267,12 @@ def dijkstras(nodes, startNode, endNode, dimensions, drawnNodes):
        
         for node in walkableNodes:
             if node[1] == curr[1] or node[0] == curr[0]:
-                if uncompletedNodes[node]['distanceFromStart'] > uncompletedNodes[curr]['distanceFromStart'] + 1:
-                    uncompletedNodes[node] = {'distanceFromStart': uncompletedNodes[curr]['distanceFromStart'] + 1,'prevNode': curr}
+                if incompleteNodes[node]['distanceFromStart'] > incompleteNodes[curr]['distanceFromStart'] + 1:
+                    incompleteNodes[node] = {'distanceFromStart': incompleteNodes[curr]['distanceFromStart'] + 1,'prevNode': curr}
             else:
-                if uncompletedNodes[node]['distanceFromStart'] > uncompletedNodes[curr]['distanceFromStart'] + 2:
-                    uncompletedNodes[node] = {'distanceFromStart': uncompletedNodes[curr]['distanceFromStart'] + 2,'prevNode': curr}
-        shortestPathNodes[curr] = uncompletedNodes[curr]
+                if incompleteNodes[node]['distanceFromStart'] > incompleteNodes[curr]['distanceFromStart'] + 2:
+                    incompleteNodes[node] = {'distanceFromStart': incompleteNodes[curr]['distanceFromStart'] + 2,'prevNode': curr}
+        shortestPathNodes[curr] = incompleteNodes[curr]
     return shortestPathNodes
         
 if __name__ == "__main__":
@@ -190,22 +342,68 @@ if __name__ == "__main__":
 
             visualizeButton = pygame.rect.Rect((int(pygame.display.get_window_size()[0] / 2) - 50, 10), (100, 30))
             pygame.draw.rect(screen, (70, 40, 100), visualizeButton)
-            font = pygame.font.SysFont(None, 15)
-            img = font.render('Click To Start', True, (225, 255, 255))
+            font = pygame.font.SysFont(None, 14)
+            img = font.render('Click To', True, (225, 255, 255))
+            img2 = font.render('Visualize Dijkstras', True, (225, 255, 255))
             screen.blit(img, (int(visualizeButton.x) + int(visualizeButton.width / 2) - 35,
                               int(visualizeButton.y) + int(visualizeButton.height / 2) - 12))
+            screen.blit(img2, (int(visualizeButton.x) + int(visualizeButton.width / 2) - 35,
+                               int(visualizeButton.y) + int(visualizeButton.height / 2)))
 
             clearButton = pygame.rect.Rect((int(pygame.display.get_window_size()[0] / 2) - 200, 10), (100, 30))
             pygame.draw.rect(screen, (70, 40, 100), clearButton)
-            font = pygame.font.SysFont(None, 15)
+            font = pygame.font.SysFont(None, 14)
             img = font.render('Click To Reset', True, (225, 255, 255))
             screen.blit(img, (int(clearButton.x) + int(clearButton.width / 2) - 35,
                               int(clearButton.y) + int(clearButton.height / 2) - 12))
+
+            aStarButton = pygame.rect.Rect((int(pygame.display.get_window_size()[0] / 2) + 100, 10), (100, 30))
+            pygame.draw.rect(screen, (70, 40, 100), aStarButton)
+            font = pygame.font.SysFont(None, 14)
+            img = font.render('Click To', True, (225, 255, 255))
+            img2 = font.render('Visualize A*', True, (225, 255, 255))
+            screen.blit(img, (int(aStarButton .x) + int(aStarButton .width / 2) - 35,
+                              int(aStarButton .y) + int(aStarButton .height / 2) - 12))
+            screen.blit(img2, (int(aStarButton .x) + int(aStarButton .width / 2) - 35,
+                              int(aStarButton .y) + int(aStarButton .height / 2)))
             if (clearButton.x <= pygame.mouse.get_pos()[0] <= (
                     clearButton.x + clearButton.width) and clearButton.y <= pygame.mouse.get_pos()[1] <= (
                         clearButton.y + clearButton.height)) and event.type == MOUSEBUTTONUP:
                 for i in range(0, maxScreenWidth, cellSize):
                     for j in range(60, maxScreenHeight, cellSize):
+                        if drawnNodes[(int(i / cellSize), int(j / cellSize))] != 2 and drawnNodes[(int(i / cellSize), int(j / cellSize))] != 3:
+                            rect = pygame.rect.Rect((i + widthOffsetToCenter, j), (cellSize - 2, cellSize - 2))
+                            pygame.draw.rect(screen, (255, 255, 255), rect)
+                            nodes[(int(i / cellSize), int(j / cellSize))] = rect
+                            drawnNodes[(int(i / cellSize), int(j / cellSize))] = 0
+            if (aStarButton.x <= pygame.mouse.get_pos()[0] <= (
+                    aStarButton.x + aStarButton.width) and aStarButton.y <= pygame.mouse.get_pos()[1] <= (
+                        aStarButton.y + aStarButton.height)) and event.type == MOUSEBUTTONUP:
+                for i in range(0, maxScreenWidth, cellSize):
+                    for j in range(60, maxScreenHeight, cellSize):
+                        if drawnNodes[(int(i / cellSize), int(j / cellSize))] == 4 or drawnNodes[(int(i / cellSize), int(j / cellSize))] == 5:
+                            rect = pygame.rect.Rect((i + widthOffsetToCenter, j), (cellSize - 2, cellSize - 2))
+                            pygame.draw.rect(screen, (255, 255, 255), rect)
+                            nodes[(int(i / cellSize), int(j / cellSize))] = rect
+                            drawnNodes[(int(i / cellSize), int(j / cellSize))] = 0
+                searched, path = aStar(nodes, startIndex, endIndex, ((int(maxScreenWidth/cellSize))-1, int(maxScreenHeight/cellSize)-1), drawnNodes)
+                for node in searched:
+                    if node in drawnNodes and drawnNodes[node] != 2 and drawnNodes[node] != 3:
+                        drawnNodes[node] = 4
+                        rect = pygame.rect.Rect((20 * node[0] + widthOffsetToCenter, 20 * node[1]),
+                                                (cellSize - 2, cellSize - 2))
+                        pygame.draw.rect(screen, (0, 255, 255), rect)
+                        nodes[(int(i / cellSize), int(j / cellSize))] = rect
+                        pygame.display.flip()
+                        # time.sleep(0.05)
+                for node in path:
+                    if node in drawnNodes and drawnNodes[node] != 2 and drawnNodes[node] != 3:
+                        drawnNodes[node] = 5
+                        rect = pygame.rect.Rect((20*node[0] + widthOffsetToCenter, 20*node[1]), (cellSize - 2, cellSize - 2))
+                        pygame.draw.rect(screen, (255, 0, 255), rect)
+                        nodes[(int(i / cellSize), int(j / cellSize))] = rect
+                        pygame.display.flip()
+                        # time.sleep(0.05)
             if (visualizeButton.x <= pygame.mouse.get_pos()[0] <= (visualizeButton.x + visualizeButton.width) and visualizeButton.y <= pygame.mouse.get_pos()[1] <= (visualizeButton.y + visualizeButton.height)) and event.type==MOUSEBUTTONUP:
                 for i in range(0, maxScreenWidth, cellSize):
                     for j in range(60, maxScreenHeight, cellSize):
