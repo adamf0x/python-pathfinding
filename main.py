@@ -73,156 +73,82 @@ class TreeNode:
         if self.right:
             self.right.PrintTree()
 
-def aStar(nodes, startNode, endNode, dimensions, drawnNodes):
-    gScores = {}
-    hScores = {}
-    openSet = nodes
-    fScores = []
-    scores = {}
-    infinity = 10000000000000000000000
-    for i in openSet:
-        scores[i] = {'fScore': infinity, 'hScore': infinity, 'gScore': infinity, 'parent': None}
-        heapq.heappush(fScores, (infinity, i))
-    for j in fScores:
-        if j[1] == startNode:
-            fScores.remove(j)
-            heapq.heappush(fScores, (0, startNode))
-            break
-    scores[startNode] = {'fScore': 0, 'hScore': 0, 'gScore': 0, 'parent': None}
 
-    current = heapq.heappop(fScores)[1]
-    path = []
+class GraphNode:
+    def __init__(self, coords):
+        self.coords = coords
+        self.fScore = 0
+        self.gScore = 0
+        self.hScore = 0
+        self.parent = None
+
+    def __lt__(self, other):
+        return self.fScore < other.fScore
+    def __gt__(self, other):
+        return self.fScore > other.fScore
+    def __le__(self, other):
+        return self.fScore <= other.fScore
+    def __ge__(self, other):
+        return self.fScore >= other.fScore
+
+
+def aStar(nodes, startNode, endNode, dimensions, drawnNodes):
     searched = []
-    while current != endNode:
-        if current[0] > 0 and drawnNodes[(current[0]-1, current[1])] != 1:
-            curr = (current[0]-1, current[1])
-            searched.append(curr)
-            scores[curr]['parent'] = current
-            if 'parent' not in current or scores[current]['parent'] == None:
-                gScore = 1
-            else:
-                gScore = scores[scores[current]['parent']]['gScore'] + 1
-            hScore = abs(curr[0] - endNode[0]) + abs(curr[1]-endNode[1])
-            fScore = gScore + hScore
-            scores[curr] = {'fScore': fScore, 'hScore': hScore, 'gScore': gScore}
-            for j in fScores:
-                if j[1] == curr:
-                    fScores.remove(j)
-                    heapq.heappush(fScores, (fScore, j[1]))
-                    break
-        if current[1] > 3 and drawnNodes[(current[0], current[1]-1)] != 1:
-            curr = (current[0], current[1]-1)
-            searched.append(curr)
-            scores[curr]['parent'] = current
-            if 'parent' not in current or scores[current]['parent'] == None:
-                gScore = 1
-            else:
-                gScore = scores[scores[current]['parent']]['gScore'] + 1
-            hScore = abs(curr[0] - endNode[0]) + abs(curr[1] - endNode[1])
-            fScore = gScore + hScore
-            scores[curr] = {'fScore': fScore, 'hScore': hScore, 'gScore': gScore}
-            for j in fScores:
-                if j[1] == curr:
-                    fScores.remove(j)
-                    heapq.heappush(fScores, (fScore, j[1]))
-                    break
-        if current[0] < dimensions[0] and drawnNodes[(current[0] + 1, current[1])] != 1:
-            curr = (current[0] + 1, current[1])
-            searched.append(curr)
-            scores[curr]['parent'] = current
-            if 'parent' not in current or scores[current]['parent'] == None:
-                gScore = 1
-            else:
-                gScore = scores[scores[current]['parent']]['gScore'] + 1
-            hScore = abs(curr[0] - endNode[0]) + abs(curr[1]-endNode[1])
-            fScore = gScore + hScore
-            scores[curr] = {'fScore': fScore, 'hScore': hScore, 'gScore': gScore}
-            for j in fScores:
-                if j[1] == curr:
-                    fScores.remove(j)
-                    heapq.heappush(fScores, (fScore, j[1]))
-                    break
-        if current[1] < dimensions[1] and drawnNodes[(current[0], current[1] + 1)] != 1:
-            curr = (current[0], current[1] + 1)
-            searched.append(curr)
-            scores[curr]['parent'] = current
-            if 'parent' not in current or scores[current]['parent'] == None:
-                gScore = 1
-            else:
-                gScore = scores[scores[current]['parent']]['gScore'] + 1
-            hScore = abs(curr[0] - endNode[0]) + abs(curr[1]-endNode[1])
-            fScore = gScore + hScore
-            scores[curr] = {'fScore': fScore, 'hScore': hScore, 'gScore': gScore}
-            for j in fScores:
-                if j[1] == curr:
-                    fScores.remove(j)
-                    heapq.heappush(fScores, (fScore, j[1]))
-                    break
-        if current[0] > 0 and current[1] > 3 and drawnNodes[(current[0] - 1, current[1] - 1)] != 1:
-            curr = (current[0] - 1, current[1] - 1)
-            searched.append(curr)
-            scores[curr]['parent'] = current
-            if 'parent' not in current or scores[current]['parent'] == None:
-                gScore = 1
-            else:
-                gScore = scores[scores[current]['parent']]['gScore'] + 1
-            hScore = abs(curr[0] - endNode[0]) + abs(curr[1]-endNode[1])
-            fScore = gScore + hScore
-            scores[curr] = {'fScore': fScore, 'hScore': hScore, 'gScore': gScore}
-            for j in fScores:
-                if j[1] == curr:
-                    fScores.remove(j)
-                    heapq.heappush(fScores, (fScore, j[1]))
-                    break
-        if current[0] < dimensions[0] and current[1] < dimensions[1] and drawnNodes[(current[0] + 1, current[1] + 1)] != 1:
-            curr = (current[0] + 1, current[1] + 1)
-            searched.append(curr)
-            scores[curr]['parent'] = current
-            if 'parent' not in current or scores[current]['parent'] == None:
-                gScore = 1
-            else:
-                gScore = scores[scores[current]['parent']]['gScore'] + 1
-            hScore = abs(curr[0] - endNode[0]) + abs(curr[1] - endNode[1])
-            fScore = gScore + hScore
-            scores[curr] = {'fScore': fScore, 'hScore': hScore, 'gScore': gScore}
-            for j in fScores:
-                if j[1] == curr:
-                    fScores.remove(j)
-                    heapq.heappush(fScores, (fScore, j[1]))
-                    break
-        if current[0] > 0 and current[1] < dimensions[1] and drawnNodes[(current[0] - 1, current[1] + 1)] != 1:
-            curr = (current[0] - 1, current[1] + 1)
-            searched.append(curr)
-            scores[curr]['parent'] = current
-            if 'parent' not in current or scores[current]['parent'] == None:
-                gScore = 1
-            else:
-                gScore = scores[scores[current]['parent']]['gScore'] + 1
-            hScore = abs(curr[0] - endNode[0]) + abs(curr[1] - endNode[1])
-            fScore = gScore + hScore
-            scores[curr] = {'fScore': fScore, 'hScore': hScore, 'gScore': gScore}
-            for j in fScores:
-                if j[1] == curr:
-                    fScores.remove(j)
-                    heapq.heappush(fScores, (fScore, j[1]))
-                    break
-        if current[0] < dimensions[0] and current[1] > 3 and drawnNodes[(current[0] + 1, current[1] - 1)] != 1:
-            curr = (current[0] + 1, current[1] - 1)
-            searched.append(curr)
-            scores[curr]['parent'] = current
-            if 'parent' not in current or scores[current]['parent'] == None:
-                gScore = 1
-            else:
-                gScore = scores[scores[current]['parent']]['gScore'] + 1
-            hScore = abs(curr[0] - endNode[0]) + abs(curr[1]-endNode[1])
-            fScore = gScore + hScore
-            scores[curr] = {'fScore': fScore, 'hScore': hScore, 'gScore': gScore}
-            for j in fScores:
-                if j[1] == curr:
-                    fScores.remove(j)
-                    heapq.heappush(fScores, (fScore, j[1]))
-                    break
-        current = heapq.heappop(fScores)[1]
+    path = []
+    start = GraphNode(startNode)
+    openSet = []
+    closedSet = {}
+    complete = False
+    for i in nodes:
+        closedSet[i] = False
+    heapq.heappush(openSet, start)
+    while openSet:
+        currentNode = heapq.heappop(openSet)
+        walkableNodes = []
+        curr = currentNode.coords
+        if curr[0] > 0 and drawnNodes[(curr[0] - 1, curr[1])] != 1:
+            walkableNodes.append((curr[0] - 1, curr[1]))
+        if curr[1] > 3 and drawnNodes[(curr[0], curr[1] - 1)] != 1:
+            walkableNodes.append((curr[0], curr[1] - 1))
+        if curr[0] < dimensions[0] and drawnNodes[(curr[0] + 1, curr[1])] != 1:
+            walkableNodes.append((curr[0] + 1, curr[1]))
+        if curr[1] < dimensions[1] and drawnNodes[(curr[0], curr[1] + 1)] != 1:
+            walkableNodes.append((curr[0], curr[1] + 1))
+        if curr[0] > 0 and curr[1] > 3 and drawnNodes[(curr[0] - 1, curr[1] - 1)] != 1:
+            walkableNodes.append((curr[0] - 1, curr[1] - 1))
+        if curr[0] < dimensions[0] and curr[1] < dimensions[1] and drawnNodes[(curr[0] + 1, curr[1] + 1)] != 1:
+            walkableNodes.append((curr[0] + 1, curr[1] + 1))
+        if curr[0] > 0 and curr[1] < dimensions[1] and drawnNodes[(curr[0] - 1, curr[1] + 1)] != 1:
+            walkableNodes.append((curr[0] - 1, curr[1] + 1))
+        if curr[0] < dimensions[0] and curr[1] > 3 and drawnNodes[(curr[0] + 1, curr[1] - 1)] != 1:
+            walkableNodes.append((curr[0] + 1, curr[1] - 1))
+        for i in walkableNodes:
+            node = GraphNode(i)
+            node.parent = currentNode
+            if node.coords == endNode:
+                complete = True
+                path.append(currentNode.coords)
+                return searched, node
+            node.gScore = currentNode.gScore + 1
+            node.hScore = abs(node.coords[0] - endNode[0]) + abs(node.coords[1] - endNode[1])
+            node.fScore = node.gScore + node.hScore
+            if closedSet[node.coords] == False:
+                nodeInOpen = False
+                for j in openSet:
+                    if j.coords == node.coords:
+                        nodeInOpen = True
+                        if j.fScore < node.fScore:
+                            break
+                        else:
+                            j.fScore = node.fScore
+                if nodeInOpen is False:
+                    heapq.heappush(openSet, node)
+                if node.coords not in searched:
+                    searched.append(node.coords)
+        closedSet[currentNode.coords] = True
+
+    if complete == False:
+        return [], []
     return searched, path
 def dijkstras(nodes, startNode, endNode, dimensions, drawnNodes):
     shortestPathNodes = {}
@@ -386,16 +312,37 @@ if __name__ == "__main__":
                             pygame.draw.rect(screen, (255, 255, 255), rect)
                             nodes[(int(i / cellSize), int(j / cellSize))] = rect
                             drawnNodes[(int(i / cellSize), int(j / cellSize))] = 0
-                searched, path = aStar(nodes, startIndex, endIndex, ((int(maxScreenWidth/cellSize))-1, int(maxScreenHeight/cellSize)-1), drawnNodes)
+                searched, endNode = aStar(nodes, startIndex, endIndex, ((int(maxScreenWidth/cellSize))-1, int(maxScreenHeight/cellSize)-1), drawnNodes)
+                if (searched, endNode) == ([], []):
+                    aStarButton = pygame.rect.Rect((maxScreenWidth / 2 - 140, maxScreenHeight / 2 - 10),
+                                                       (280, 30))
+                    pygame.draw.rect(screen, (255, 255, 255), aStarButton)
+                    font = pygame.font.SysFont(None, 30)
+                    img = font.render('End node could not be found', True, (255, 0, 0))
+                    screen.blit(img, (maxScreenWidth / 2 - 140,
+                                      maxScreenHeight / 2))
+                    pygame.display.flip()
+                    time.sleep(2)
+                    continue
+
                 for node in searched:
                     if node in drawnNodes and drawnNodes[node] != 2 and drawnNodes[node] != 3:
                         drawnNodes[node] = 4
                         rect = pygame.rect.Rect((20 * node[0] + widthOffsetToCenter, 20 * node[1]),
                                                 (cellSize - 2, cellSize - 2))
+                        pygame.draw.rect(screen, (255, 255, 0), rect)
+                        pygame.display.flip()
+                        time.sleep(0.01)
                         pygame.draw.rect(screen, (0, 255, 255), rect)
                         nodes[(int(i / cellSize), int(j / cellSize))] = rect
                         pygame.display.flip()
-                        # time.sleep(0.05)
+                        time.sleep(0.01)
+                path = []
+                currNode = endNode
+                path.append(currNode.coords)
+                while currNode is not None:
+                    path.append(currNode.coords)
+                    currNode = currNode.parent
                 for node in path:
                     if node in drawnNodes and drawnNodes[node] != 2 and drawnNodes[node] != 3:
                         drawnNodes[node] = 5
@@ -403,7 +350,7 @@ if __name__ == "__main__":
                         pygame.draw.rect(screen, (255, 0, 255), rect)
                         nodes[(int(i / cellSize), int(j / cellSize))] = rect
                         pygame.display.flip()
-                        # time.sleep(0.05)
+                        time.sleep(0.005)
             if (visualizeButton.x <= pygame.mouse.get_pos()[0] <= (visualizeButton.x + visualizeButton.width) and visualizeButton.y <= pygame.mouse.get_pos()[1] <= (visualizeButton.y + visualizeButton.height)) and event.type==MOUSEBUTTONUP:
                 for i in range(0, maxScreenWidth, cellSize):
                     for j in range(60, maxScreenHeight, cellSize):
