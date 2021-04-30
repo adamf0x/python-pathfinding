@@ -236,6 +236,16 @@ if __name__ == "__main__":
                 maxScreenHeight = pygame.display.get_window_size()[1] - pygame.display.get_window_size()[1] % cellSize
                 while maxScreenHeight % cellSize != 0:
                     maxScreenHeight = pygame.display.get_window_size()[1] - pygame.display.get_window_size()[1] % cellSize
+            if event.type == VIDEORESIZE:
+                if endIndex[0] > int(maxScreenWidth/cellSize) - 1:
+                    print(endIndex, int(maxScreenWidth/cellSize), int(maxScreenHeight/cellSize))
+                    drawnNodes[endIndex] = 0
+                    endIndex = (int(maxScreenWidth/cellSize) - 1, endIndex[1])
+                if endIndex[1] > int(maxScreenHeight/cellSize) - 1:
+                    drawnNodes[endIndex] = 0
+                    endIndex = (endIndex[0], int(maxScreenHeight/cellSize) - 1)
+                print(endIndex, int(maxScreenWidth / cellSize), int(maxScreenHeight / cellSize))
+                drawnNodes[endIndex] = 3
             nodes = {}
             for i in range(0, maxScreenWidth, cellSize):
                 for j in range(60, maxScreenHeight, cellSize):
@@ -350,7 +360,7 @@ if __name__ == "__main__":
                         pygame.draw.rect(screen, (255, 0, 255), rect)
                         nodes[(int(i / cellSize), int(j / cellSize))] = rect
                         pygame.display.flip()
-                        time.sleep(0.005)
+                        time.sleep(0.05)
             if (visualizeButton.x <= pygame.mouse.get_pos()[0] <= (visualizeButton.x + visualizeButton.width) and visualizeButton.y <= pygame.mouse.get_pos()[1] <= (visualizeButton.y + visualizeButton.height)) and event.type==MOUSEBUTTONUP:
                 for i in range(0, maxScreenWidth, cellSize):
                     for j in range(60, maxScreenHeight, cellSize):
