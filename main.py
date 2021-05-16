@@ -9,88 +9,7 @@ import time
 import pygame
 from pygame.locals import *
 
-import heapq
-
 from operator import *
-
-class Node:
-
-    # Constructor to initialize the node object
-    def __init__(self, data):
-        self.data = data
-        self.next = None
-
-
-class LinkedList:
-
-    # Function to initialize head
-    def __init__(self):
-        self.head = None
-
-    # Function to insert a new node at the beginning
-    def push(self, new_data):
-        new_node = Node(new_data)
-        new_node.next = self.head
-        self.head = new_node
-
-    # Utility function to print the linked LinkedList
-    def printList(self):
-        temp = self.head
-        while (temp):
-            print
-            temp.data,
-            temp = temp.next
-
-class TreeNode:
-
-    def __init__(self, data):
-
-        self.left = None
-        self.right = None
-        self.data = data
-
-    def insert(self, data):
-# Compare the new value with the parent node
-        if self.data:
-            if data < self.data:
-                if self.left is None:
-                    self.left = TreeNode(data)
-                else:
-                    self.left.insert(data)
-            elif data > self.data:
-                if self.right is None:
-                    self.right = TreeNode(data)
-                else:
-                    self.right.insert(data)
-        else:
-            self.data = data
-
-# Print the tree
-    def PrintTree(self):
-        if self.left:
-            self.left.PrintTree()
-        print( self.data),
-        if self.right:
-            self.right.PrintTree()
-
-
-class GraphNode:
-    def __init__(self, coords):
-        self.coords = coords
-        self.fScore = 0
-        self.gScore = 0
-        self.hScore = 0
-        self.parent = None
-
-    def __lt__(self, other):
-        return self.fScore < other.fScore
-    def __gt__(self, other):
-        return self.fScore > other.fScore
-    def __le__(self, other):
-        return self.fScore <= other.fScore
-    def __ge__(self, other):
-        return self.fScore >= other.fScore
-
 
 def aStar(nodes, startNode, endNode, dimensions, drawnNodes):
     searched = []
@@ -451,40 +370,6 @@ if __name__ == "__main__":
             placeEnd = False
             visualize = False
             pygame.display.flip()
-    # node1 = TreeNode(4)
-    # node1.insert(2)
-    # node1.insert(7)
-    # node1.insert(9)
-    # node1.insert(6)
-    # node1.PrintTree()
-    # print()
-    # def invertTree(rootNode):
-    #     if rootNode.left is None and rootNode.right is None:
-    #         return
-    #     temp = rootNode.left
-    #     rootNode.left = rootNode.right
-    #     rootNode.right = temp
-    #     invertTree(rootNode.left)
-    #     invertTree(rootNode.right)
-    # invertTree(node1)
-    # node1.PrintTree()
-    # print()
-    # hugeValues = {}
-    # def nthHugeNumber(number):
-    #     if number <= 1:
-    #         return number
-    #     try:
-    #         if hugeValues[number]:
-    #             return hugeValues[number]
-    #         else:
-    #             hugeValues[number] = (nthHugeNumber(number - 1) + nthHugeNumber(number - 2)) ^ (
-    #                         nthHugeNumber(number - 2) ^ math.factorial(2147483647))
-    #             return (nthHugeNumber(number - 1) + nthHugeNumber(number - 2)) ^ (
-    #                         nthHugeNumber(number - 2) ^ math.factorial(10000))
-    #     except KeyError as e:
-    #         hugeValues[number] = (nthHugeNumber(number-1) + nthHugeNumber(number-2))^(nthHugeNumber(number-2)^math.factorial(10000))
-    #         return (nthHugeNumber(number-1) + nthHugeNumber(number-2))^(nthHugeNumber(number-2)^math.factorial(10000))
-    # print(nthHugeNumber(998))
 
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
