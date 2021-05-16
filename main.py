@@ -8,8 +8,26 @@ import time
 
 import pygame
 from pygame.locals import *
+import heapq
 
 from operator import *
+
+class GraphNode:
+    def __init__(self, coords):
+        self.coords = coords
+        self.fScore = 0
+        self.gScore = 0
+        self.hScore = 0
+        self.parent = None
+    def __lt__(self, other):
+        return self.fScore < other.fScore
+    def __gt__(self, other):
+        return self.fScore > other.fScore
+    def __le__(self, other):
+        return self.fScore <= other.fScore
+    def __ge__(self, other):
+        return self.fScore >= other.fScore
+
 
 def aStar(nodes, startNode, endNode, dimensions, drawnNodes):
     searched = []
